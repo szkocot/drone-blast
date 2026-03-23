@@ -15,9 +15,7 @@
   $: peak   = peakInWindow(grid, hourOffset);
   $: window = bestFlyingWindow(grid, thresholdKmh);
 
-  function displaySpeed(kmh: number) {
-    return convertFromKmh(kmh, unit).toFixed(0);
-  }
+  $: displaySpeed = (kmh: number) => convertFromKmh(kmh, unit).toFixed(0);
 
   function colorClass(kmh: number): string {
     const r = kmh / thresholdKmh;
