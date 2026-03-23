@@ -29,6 +29,7 @@ export default defineConfig(async ({ command }) => {
     base: '/fpv-blast/',
     plugins,
     test: {
+      exclude: ['.worktrees/**', 'node_modules/**', 'dist/**'],
       environment: 'jsdom',
       globals: true
     }

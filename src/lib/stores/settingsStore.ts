@@ -45,11 +45,15 @@ export function thresholdStep(unit: WindUnit): number {
 }
 
 export function windColor(speed: number, thresholdKmh: number): string {
+  const prefersLight =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: light)').matches;
+
   const lightTheme =
     typeof document !== 'undefined' &&
     (document.documentElement.getAttribute('data-theme') === 'light' ||
-      (document.documentElement.getAttribute('data-theme') !== 'dark' &&
-        window.matchMedia('(prefers-color-scheme: light)').matches));
+      (document.documentElement.getAttribute('data-theme') !== 'dark' && prefersLight));
 
   const ratio = speed / thresholdKmh;
   const opacity = lightTheme
