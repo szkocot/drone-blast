@@ -2,12 +2,13 @@
 <script lang="ts">
   import { t } from '../i18n';
   import { convertFromKmh, convertToKmh, thresholdStep } from '../stores/settingsStore';
-  import type { Settings, WindUnit, AppAppearance, AppLanguage, TempUnit } from '../types';
+  import type { Settings, WindUnit, AppAppearance, AppLanguage, TempUnit, LocationMode, CustomLocation } from '../types';
 
   export let settings: Settings;
   export let modelCount: number;
   export let onClose: () => void;
   export let onChange: (s: Partial<Settings>) => void;
+  export let onOpenPicker: () => void;
 
   $: displayThreshold = convertFromKmh(settings.thresholdKmh, settings.unit);
   $: step = thresholdStep(settings.unit);
@@ -25,6 +26,15 @@
   const appearances: AppAppearance[] = ['auto', 'light', 'dark'];
   const languages: AppLanguage[] = ['auto', 'en', 'pl'];
   const tempUnits: TempUnit[] = ['celsius', 'fahrenheit'];
+
+  const locationModes: LocationMode[] = ['auto', 'custom'];
+
+  function onLocationModeChange(lm: LocationMode) {
+    onChange({ locationMode: lm });
+    if (lm === 'custom' && !settings.customLocation) {
+      onOpenPicker();
+    }
+  }
 </script>
 
 <!-- Backdrop -->
@@ -33,6 +43,26 @@
 <!-- Sheet -->
 <div class="sheet" role="dialog" aria-label={$t.settings}>
   <div class="handle"></div>
+
+  <div class="section">
+    <div class="section-label">{$t.location}</div>
+    <div class="seg-group">
+      {#each locationModes as lm}
+        <button class:active={settings.locationMode === lm}
+                on:click={() => onLocationModeChange(lm)}>
+          {$t.locationModes[lm]}
+        </button>
+      {/each}
+    </div>
+    {#if settings.locationMode === 'custom'}
+      <button class="location-row" on:click={onOpenPicker}>
+        <span class="location-name">
+          {settings.customLocation?.name ?? $t.notSet}
+        </span>
+        <span class="location-change">{$t.change} →</span>
+      </button>
+    {/if}
+  </div>
 
   <div class="section">
     <div class="row">
@@ -174,4 +204,12 @@
     border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
     cursor: pointer;
   }
+
+  .location-row {
+    display: flex; justify-content: space-between; align-items: center;
+    width: 100%; background: none; border: none;
+    padding: 8px 0 0; cursor: pointer; color: var(--text);
+  }
+  .location-name { font-size: 13px; font-weight: 600; }
+  .location-change { font-size: 12px; color: var(--blue); }
 </style>

@@ -12,14 +12,21 @@
   import TimeSlider      from './lib/components/TimeSlider.svelte';
   import ThresholdFooter from './lib/components/ThresholdFooter.svelte';
   import SettingsSheet   from './lib/components/SettingsSheet.svelte';
+  import LocationPicker from './lib/components/LocationPicker.svelte';
   import ErrorBanner     from './lib/components/ErrorBanner.svelte';
   import DesktopUtilityRail from './lib/components/DesktopUtilityRail.svelte';
   import WeatherStrip from './lib/components/WeatherStrip.svelte';
 
   let showSettings = false;
+  let showLocationPicker = false;
   let gpsError = false;
   let lastFetchLat: number | null = null;
   let lastFetchLon: number | null = null;
+
+  // Open picker automatically when in Custom mode with no saved location
+  $: if ($settingsStore.locationMode === 'custom' && !$settingsStore.customLocation && !showLocationPicker) {
+    showLocationPicker = true;
+  }
 
   // Apply theme
   $: {
@@ -45,8 +52,28 @@
   }
 
   function requestLocation() {
+    const mode = $settingsStore.locationMode;
+    const custom = $settingsStore.customLocation;
+
+    if (mode === 'custom') {
+      if (custom) {
+        fetchWind(custom.lat, custom.lon);
+        locationName.set(custom.name);
+      }
+      // No custom location yet — picker will open via reactive statement above
+      return;
+    }
+
+    // Auto mode
     gpsError = false;
-    navigator.geolocation.getCurrentPosition(onLocation, () => { gpsError = true; });
+    navigator.geolocation.getCurrentPosition(onLocation, () => {
+      if (custom) {
+        fetchWind(custom.lat, custom.lon);
+        locationName.set(custom.name);
+      } else {
+        gpsError = true;
+      }
+    });
   }
 
   onMount(() => {
@@ -145,6 +172,23 @@
       modelCount={$fetchState.type === 'loaded' ? $fetchState.modelCount : 0}
       onClose={() => showSettings = false}
       onChange={patch => settingsStore.update(s => ({ ...s, ...patch }))}
+      onOpenPicker={() => { showSettings = false; showLocationPicker = true; }}
+    />
+  {/if}
+
+  {#if showLocationPicker}
+    <LocationPicker
+      initialLocation={$settingsStore.customLocation}
+      onConfirm={(loc) => {
+        settingsStore.update(s => ({ ...s, customLocation: loc }));
+        showLocationPicker = false;
+      }}
+      onClose={() => {
+        showLocationPicker = false;
+        if (!$settingsStore.customLocation) {
+          settingsStore.update(s => ({ ...s, locationMode: 'auto' }));
+        }
+      }}
     />
   {/if}
 </div>
