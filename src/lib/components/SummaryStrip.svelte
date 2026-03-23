@@ -56,10 +56,17 @@
 </div>
 
 <style>
-  .strip { display: flex; gap: 8px; padding: 10px 12px; }
+  .strip {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
   .card {
     flex: 1;
-    display: flex; flex-direction: column; align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 2px;
     padding: 8px 4px;
     border-radius: 10px;
@@ -77,4 +84,33 @@
   .card.green .value  { color: var(--green); }
   .card.yellow .value { color: var(--yellow); }
   .card.red .value    { color: var(--red); }
+
+  @media (min-width: 1024px) {
+    .strip {
+      gap: 12px;
+      padding: 14px 20px 16px;
+    }
+
+    .card {
+      align-items: flex-start;
+      gap: 6px;
+      min-height: 112px;
+      padding: 14px 16px;
+      border-radius: 14px;
+    }
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 28px;
+    }
+
+    .sub {
+      font-size: 12px;
+    }
+  }
 </style>

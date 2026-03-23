@@ -29,4 +29,26 @@
   .dot      { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
   .loc      { font-size: 11px; color: var(--text-muted); }
   .date     { font-size: 11px; color: var(--text-muted); }
+
+  @media (min-width: 1024px) {
+    header {
+      padding: 16px 20px 14px;
+      align-items: flex-end;
+    }
+
+    .app-name {
+      font-size: 18px;
+      letter-spacing: 1.8px;
+    }
+
+    .loc-row {
+      gap: 7px;
+      margin-top: 5px;
+    }
+
+    .loc,
+    .date {
+      font-size: 12px;
+    }
+  }
 </style>
