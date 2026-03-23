@@ -40,17 +40,11 @@
       {/each}
     </div>
   </div>
-
-  <div class="rail-section rail-placeholder">
-    <p class="eyebrow">Status</p>
-    <p class="placeholder-title">Support block placeholder</p>
-    <p class="placeholder-copy">Reserved for forecast status or support actions from existing app state later.</p>
-  </div>
 </aside>
 
 <style>
   .utility-rail {
-    display: flex;
+    display: none;
     width: 280px;
     flex-direction: column;
     gap: 12px;
@@ -106,8 +100,7 @@
     color: var(--text);
   }
 
-  .threshold-note,
-  .placeholder-copy {
+  .threshold-note {
     margin: 8px 0 0;
     font-size: 12px;
     line-height: 1.5;
@@ -147,12 +140,5 @@
     color: var(--red);
     background: rgba(255,60,60,0.08);
     border-color: rgba(255,60,60,0.2);
-  }
-
-  .placeholder-title {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
   }
 </style>
