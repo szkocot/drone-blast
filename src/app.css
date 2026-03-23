@@ -115,9 +115,6 @@ html, body {
 }
 
 @media (min-width: 768px) {
-  /* Slider hint and tick text */
-  .hint { font-size: 12px !important; }
-  .tick { font-size: 12px !important; }
   /* Settings gear icon */
   .gear { font-size: 26px !important; }
 }
