@@ -13,6 +13,7 @@
   import ThresholdFooter from './lib/components/ThresholdFooter.svelte';
   import SettingsSheet   from './lib/components/SettingsSheet.svelte';
   import ErrorBanner     from './lib/components/ErrorBanner.svelte';
+  import DesktopUtilityRail from './lib/components/DesktopUtilityRail.svelte';
 
   let showSettings = false;
   let gpsError = false;
@@ -78,43 +79,55 @@
     </div>
   {:else if $fetchState.type === 'loaded' && $windGrid}
     <!-- Main UI -->
-    <AppHeader locationName={$locationName} />
+    <div class="desktop-shell">
+      <div class="main-column">
+        <AppHeader locationName={$locationName} />
 
-    {#if $fetchState.modelCount < 6}
-      <ErrorBanner
-        message={t.limitedData($fetchState.modelCount)}
-        style="warning"
-        onRetry={requestLocation}
-      />
-    {/if}
+        {#if $fetchState.modelCount < 6}
+          <ErrorBanner
+            message={t.limitedData($fetchState.modelCount)}
+            style="warning"
+            onRetry={requestLocation}
+          />
+        {/if}
 
-    <SummaryStrip
-      grid={$windGrid}
-      hourOffset={$hourOffset}
-      thresholdKmh={$settingsStore.thresholdKmh}
-      unit={$settingsStore.unit}
-    />
+        <SummaryStrip
+          grid={$windGrid}
+          hourOffset={$hourOffset}
+          thresholdKmh={$settingsStore.thresholdKmh}
+          unit={$settingsStore.unit}
+        />
 
-    <div class="chart-area">
-      <HeatmapCanvas
-        grid={$windGrid}
-        hourOffset={$hourOffset}
+        <div class="chart-area">
+          <HeatmapCanvas
+            grid={$windGrid}
+            hourOffset={$hourOffset}
+            thresholdKmh={$settingsStore.thresholdKmh}
+          />
+        </div>
+
+        <TimeSlider
+          grid={$windGrid}
+          hourOffset={$hourOffset}
+          thresholdKmh={$settingsStore.thresholdKmh}
+          onChange={v => hourOffset.set(v)}
+        />
+
+        <div class="footer-slot">
+          <ThresholdFooter
+            thresholdKmh={$settingsStore.thresholdKmh}
+            unit={$settingsStore.unit}
+            onSettings={() => showSettings = true}
+          />
+        </div>
+      </div>
+
+      <DesktopUtilityRail
         thresholdKmh={$settingsStore.thresholdKmh}
+        unit={$settingsStore.unit}
+        onSettings={() => showSettings = true}
       />
     </div>
-
-    <TimeSlider
-      grid={$windGrid}
-      hourOffset={$hourOffset}
-      thresholdKmh={$settingsStore.thresholdKmh}
-      onChange={v => hourOffset.set(v)}
-    />
-
-    <ThresholdFooter
-      thresholdKmh={$settingsStore.thresholdKmh}
-      unit={$settingsStore.unit}
-      onSettings={() => showSettings = true}
-    />
   {/if}
 
   {#if showSettings}
@@ -133,7 +146,20 @@
     height: 100%; overflow: hidden;
     background: var(--bg);
   }
+  .desktop-shell {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+  .main-column {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+  }
   .chart-area { flex: 1; overflow: hidden; min-height: 0; }
+  .footer-slot { display: block; }
 
   .full-screen-msg {
     flex: 1; display: flex; flex-direction: column;
@@ -150,4 +176,15 @@
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (min-width: 1100px) {
+    .desktop-shell {
+      gap: 20px;
+      padding-right: 20px;
+    }
+
+    .footer-slot {
+      display: none;
+    }
+  }
 </style>
