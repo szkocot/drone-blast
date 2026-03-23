@@ -351,6 +351,7 @@ Verify it appears in `package.json` dependencies.
   let pickedLocation: CustomLocation | null = initialLocation ?? null;
   let searchQuery = '';
   let searchResults: GeoResult[] = [];
+  let searchAttempted = false;
   let searchTimeout: ReturnType<typeof setTimeout>;
 
   function formatCoords(lat: number, lon: number): string {
@@ -359,9 +360,10 @@ Verify it appears in `package.json` dependencies.
 
   function onSearchInput() {
     clearTimeout(searchTimeout);
-    if (searchQuery.length < 2) { searchResults = []; return; }
+    if (searchQuery.length < 2) { searchResults = []; searchAttempted = false; return; }
     searchTimeout = setTimeout(async () => {
       searchResults = await forwardGeocode(searchQuery);
+      searchAttempted = true;
     }, 400);
   }
 
@@ -416,6 +418,10 @@ Verify it appears in `package.json` dependencies.
               <span class="result-name">{result.name}</span>
             </button>
           {/each}
+        </div>
+      {:else if searchAttempted && searchQuery.length >= 2}
+        <div class="results-dropdown">
+          <div class="result-item no-results">No results</div>
         </div>
       {/if}
     </div>
@@ -494,6 +500,7 @@ Verify it appears in `package.json` dependencies.
   }
   .result-item:last-child { border-bottom: none; }
   .result-item:hover { background: var(--surface2); }
+  .result-item.no-results { color: var(--text-muted); font-style: italic; cursor: default; }
   .result-name { display: block; }
 
   .map-wrap { flex: 1; position: relative; }
@@ -610,10 +617,10 @@ Insert the Location section as the **first** section in the sheet, before the Wi
   </div>
   {#if settings.locationMode === 'custom'}
     <button class="location-row" on:click={onOpenPicker}>
-      <span class="location-name-text">
+      <span class="location-name">
         {settings.customLocation?.name ?? $t.notSet}
       </span>
-      <span class="location-change-text">{$t.change} →</span>
+      <span class="location-change">{$t.change} →</span>
     </button>
   {/if}
 </div>
@@ -627,8 +634,8 @@ Add styles for the new location row at the bottom of `<style>`:
   width: 100%; background: none; border: none;
   padding: 8px 0 0; cursor: pointer; color: var(--text);
 }
-.location-name-text { font-size: 13px; font-weight: 600; }
-.location-change-text { font-size: 12px; color: var(--blue); }
+.location-name { font-size: 13px; font-weight: 600; }
+.location-change { font-size: 12px; color: var(--blue); }
 ```
 
 - [ ] **Step 2: Verify TypeScript compiles after SettingsSheet change**
