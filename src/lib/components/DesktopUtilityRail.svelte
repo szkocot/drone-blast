@@ -11,10 +11,10 @@
   $: displayThreshold = convertFromKmh(thresholdKmh, unit).toFixed(0);
   $: unitLabel = $t.units[unit];
 
-  const legendItems = [
+  $: legendItems = [
     { label: 'OK', tone: 'ok' },
     { label: '±20%', tone: 'caution' },
-    { label: 'No-fly', tone: 'nofly' }
+    { label: $t.legendNoFly, tone: 'nofly' }
   ];
 </script>
 
@@ -22,7 +22,7 @@
   <div class="rail-section rail-actions">
     <button class="settings-btn" on:click={onSettings}>
       <span class="gear" aria-hidden="true">⚙</span>
-      <span>Settings & Units</span>
+      <span>{$t.settingsAndUnits}</span>
     </button>
   </div>
 
@@ -33,7 +33,7 @@
   </div>
 
   <div class="rail-section">
-    <p class="eyebrow">Legend</p>
+    <p class="eyebrow">{$t.legend}</p>
     <div class="legend-list">
       {#each legendItems as item}
         <span class="legend-chip {item.tone}">{item.label}</span>

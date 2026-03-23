@@ -2,6 +2,7 @@
 <script lang="ts">
   import { convertFromKmh } from '../stores/settingsStore';
   import type { WindUnit } from '../types';
+  import { t } from '../i18n';
 
   export let thresholdKmh: number;
   export let unit: WindUnit;
@@ -14,20 +15,20 @@
 <footer class="threshold-footer">
   <div class="footer-meta">
     <div class="threshold">
-      <span class="label">Threshold</span>
+      <span class="label">{$t.threshold}</span>
       <span class="value">{displayVal} {unitLabel}</span>
     </div>
 
     <div class="legend" aria-label="Wind legend">
       <span class="legend-chip ok">OK</span>
       <span class="legend-chip warn">±20%</span>
-      <span class="legend-chip danger">No-fly</span>
+      <span class="legend-chip danger">{$t.legendNoFly}</span>
     </div>
   </div>
 
   <button class="settings-btn" on:click={onSettings}>
     <span class="gear" aria-hidden="true">⚙</span>
-    <span>Settings</span>
+    <span>{$t.settings}</span>
   </button>
 </footer>
 

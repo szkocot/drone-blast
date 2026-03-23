@@ -44,4 +44,8 @@ export const pl: Translations = {
   back: 'Wstecz',
   sliderHint: '7-dniowe okno · przeciągnij, aby nawigować',
   dateLocale: 'pl-PL',
+  settingsAndUnits: 'Ustawienia i jednostki',
+  threshold: 'Próg',
+  legend: 'Legenda',
+  legendNoFly: 'Zakaz lotu',
 };

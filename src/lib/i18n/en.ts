@@ -43,5 +43,9 @@ export const en = {
   back: 'Back',
   sliderHint: '7-day window · drag to navigate',
   dateLocale: 'en-GB',
+  settingsAndUnits: 'Settings & Units',
+  threshold: 'Threshold',
+  legend: 'Legend',
+  legendNoFly: 'No-fly',
 };
 
