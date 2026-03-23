@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/fpv-blast/sw.js', { scope: '/fpv-blast/' })})}
