@@ -2,6 +2,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { WindGrid } from '../types';
+  import { nextOffsetFromKey } from '../sliderNavigation';
   import { windColor } from '../stores/settingsStore';
 
   export let grid: WindGrid;
@@ -76,6 +77,13 @@
     e.currentTarget.setPointerCapture(e.pointerId);
     handlePointer(e);
   }
+
+  function onTrackKeydown(e: KeyboardEvent) {
+    const next = nextOffsetFromKey(e.key, hourOffset, MAX_OFFSET);
+    if (next === null) return;
+    e.preventDefault();
+    onChange(next);
+  }
 </script>
 
 <div class="slider-area">
@@ -89,7 +97,9 @@
     bind:this={trackEl}
     on:pointerdown={onTrackDown}
     on:pointermove={e => e.buttons && handlePointer(e)}
+    on:keydown={onTrackKeydown}
     role="slider"
+    aria-label="Forecast timeline"
     aria-valuenow={hourOffset}
     aria-valuemin={0}
     aria-valuemax={MAX_OFFSET}
