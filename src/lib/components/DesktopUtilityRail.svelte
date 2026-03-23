@@ -13,23 +13,23 @@
 
   const legendItems = [
     { label: 'OK', tone: 'ok' },
-    { label: 'Caution', tone: 'caution' },
+    { label: '±20%', tone: 'caution' },
     { label: 'No-fly', tone: 'nofly' }
   ];
 </script>
 
 <aside class="utility-rail" aria-label="Desktop utility rail">
   <div class="rail-section rail-actions">
-    <button class="settings-btn" on:click={onSettings} aria-label="Open settings">
+    <button class="settings-btn" on:click={onSettings}>
       <span class="gear" aria-hidden="true">⚙</span>
       <span>Settings & Units</span>
     </button>
   </div>
 
   <div class="rail-section">
-    <p class="eyebrow">Threshold</p>
+    <p class="eyebrow">{t.windThreshold}</p>
     <p class="threshold-value">{displayThreshold} {unitLabel}</p>
-    <p class="threshold-note">Yellow starts at 80% of the configured threshold.</p>
+    <p class="threshold-note">{t.thresholdHint}</p>
   </div>
 
   <div class="rail-section">
@@ -50,7 +50,7 @@
 
 <style>
   .utility-rail {
-    display: none;
+    display: flex;
     width: 280px;
     flex-direction: column;
     gap: 12px;
@@ -154,11 +154,5 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--text);
-  }
-
-  @media (min-width: 1100px) {
-    .utility-rail {
-      display: flex;
-    }
   }
 </style>

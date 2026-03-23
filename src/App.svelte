@@ -113,13 +113,11 @@
           onChange={v => hourOffset.set(v)}
         />
 
-        <div class="footer-slot">
-          <ThresholdFooter
-            thresholdKmh={$settingsStore.thresholdKmh}
-            unit={$settingsStore.unit}
-            onSettings={() => showSettings = true}
-          />
-        </div>
+        <ThresholdFooter
+          thresholdKmh={$settingsStore.thresholdKmh}
+          unit={$settingsStore.unit}
+          onSettings={() => showSettings = true}
+        />
       </div>
 
       <DesktopUtilityRail
@@ -159,7 +157,6 @@
     flex-direction: column;
   }
   .chart-area { flex: 1; overflow: hidden; min-height: 0; }
-  .footer-slot { display: block; }
 
   .full-screen-msg {
     flex: 1; display: flex; flex-direction: column;
@@ -176,15 +173,4 @@
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  @media (min-width: 1100px) {
-    .desktop-shell {
-      gap: 20px;
-      padding-right: 20px;
-    }
-
-    .footer-slot {
-      display: none;
-    }
-  }
 </style>
