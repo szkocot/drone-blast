@@ -94,6 +94,7 @@
     <TimeSlider
       grid={$windGrid}
       hourOffset={$hourOffset}
+      thresholdKmh={$settingsStore.thresholdKmh}
       onChange={v => hourOffset.set(v)}
     />
 

@@ -1,13 +1,18 @@
 <!-- src/lib/components/TimeSlider.svelte -->
 <script lang="ts">
+  import { onMount } from 'svelte';
   import type { WindGrid } from '../types';
+  import { windColor } from '../stores/settingsStore';
+
   export let grid: WindGrid;
   export let hourOffset: number;
+  export let thresholdKmh: number;
   export let onChange: (offset: number) => void;
 
   const MAX_OFFSET = 144; // 168h - 24h window
 
   let trackEl: HTMLDivElement;
+  let trackCanvas: HTMLCanvasElement;
 
   function dayLabel(idx: number): string {
     if (idx >= grid.times.length) return '';
@@ -16,6 +21,49 @@
 
   $: currentLabel = dayLabel(hourOffset);
   $: fillPct = (hourOffset / MAX_OFFSET) * 100;
+
+  function parseRGBA(css: string): [number, number, number, number] {
+    const m = css.match(/rgba?\((\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)(?:,\s*([\d.]+))?\)/);
+    if (!m) return [0, 0, 0, 1];
+    return [+m[1], +m[2], +m[3], m[4] !== undefined ? +m[4] : 1];
+  }
+
+  function toCSS([r, g, b, a]: [number, number, number, number]): string {
+    return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a.toFixed(2)})`;
+  }
+
+  function avgWindColor(t: number): string {
+    let r = 0, g = 0, b = 0, a = 0;
+    const rows = 18;
+    for (let hi = 0; hi < rows; hi++) {
+      const speed = grid.data[t]?.[hi] ?? 0;
+      const [cr, cg, cb, ca] = parseRGBA(windColor(speed, thresholdKmh));
+      r += cr; g += cg; b += cb; a += ca;
+    }
+    return toCSS([r / rows, g / rows, b / rows, Math.min(1, (a / rows) * 1.2)]);
+  }
+
+  function drawTrack() {
+    if (!trackCanvas) return;
+    const parent = trackCanvas.parentElement!;
+    const W = parent.clientWidth;
+    const H = parent.clientHeight - 10;
+    trackCanvas.width  = W;
+    trackCanvas.height = H;
+    const ctx = trackCanvas.getContext('2d')!;
+    const total = Math.min(grid.times.length, 168);
+    if (total < 2) return;
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    for (let t = 0; t < total; t++) {
+      grad.addColorStop(t / (total - 1), avgWindColor(t));
+    }
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  $: thresholdKmh, drawTrack();
+
+  onMount(() => { drawTrack(); });
 
   function handlePointer(e: PointerEvent) {
     if (!trackEl) return;
@@ -47,7 +95,11 @@
     aria-valuemax={MAX_OFFSET}
     tabindex="0"
   >
-    <div class="fill" style="width: {fillPct}%"></div>
+    <canvas bind:this={trackCanvas} class="track-canvas"></canvas>
+    <div
+      class="window-highlight"
+      style="left: {(hourOffset / 168 * 100).toFixed(2)}%; width: {(24 / 168 * 100).toFixed(2)}%"
+    ></div>
     <div class="thumb" style="left: {fillPct}%"></div>
   </div>
 
@@ -69,14 +121,14 @@
     display: flex; align-items: center;
     touch-action: none;
   }
-  .track::before {
-    content: ''; position: absolute; inset: 6px 0;
-    background: var(--border); border-radius: 2px;
+  .track-canvas {
+    position: absolute; inset: 5px 0;
+    border-radius: 4px; pointer-events: none;
   }
-  .fill {
-    position: absolute; left: 0; top: 6px; bottom: 6px;
-    background: var(--blue); border-radius: 2px;
-    pointer-events: none;
+  .window-highlight {
+    position: absolute; top: 3px; bottom: 3px;
+    border: 2px solid rgba(255,255,255,0.75);
+    border-radius: 4px; pointer-events: none;
   }
   .thumb {
     position: absolute; width: 16px; height: 16px;
