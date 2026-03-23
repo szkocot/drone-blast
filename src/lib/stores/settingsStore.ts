@@ -13,7 +13,7 @@ function load(): Settings {
 }
 
 function defaults(): Settings {
-  return { thresholdKmh: 25, unit: 'kmh', appearance: 'auto', refetchRadiusKm: 5 };
+  return { thresholdKmh: 25, unit: 'kmh', appearance: 'auto', refetchRadiusKm: 5, language: 'auto' };
 }
 
 const _store = writable<Settings>(load());

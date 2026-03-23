@@ -2,6 +2,7 @@
 
 export type WindUnit = 'kmh' | 'ms' | 'knots';
 export type AppAppearance = 'auto' | 'light' | 'dark';
+export type AppLanguage = 'auto' | 'en' | 'pl';
 
 export interface WindGrid {
   data: number[][];   // [timeIndex 0..167][heightIndex 0..17] = km/h
@@ -20,6 +21,7 @@ export interface Settings {
   unit: WindUnit;
   appearance: AppAppearance;
   refetchRadiusKm: number;
+  language: AppLanguage;
 }
 
 export type FetchState =
