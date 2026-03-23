@@ -1,6 +1,6 @@
 <!-- src/lib/components/DesktopUtilityRail.svelte -->
 <script lang="ts">
-  import { t } from '../i18n/en';
+  import { t } from '../i18n';
   import { convertFromKmh } from '../stores/settingsStore';
   import type { WindUnit } from '../types';
 
@@ -9,7 +9,7 @@
   export let onSettings: () => void;
 
   $: displayThreshold = convertFromKmh(thresholdKmh, unit).toFixed(0);
-  $: unitLabel = t.units[unit];
+  $: unitLabel = $t.units[unit];
 
   const legendItems = [
     { label: 'OK', tone: 'ok' },
@@ -27,9 +27,9 @@
   </div>
 
   <div class="rail-section">
-    <p class="eyebrow">{t.windThreshold}</p>
+    <p class="eyebrow">{$t.windThreshold}</p>
     <p class="threshold-value">{displayThreshold} {unitLabel}</p>
-    <p class="threshold-note">{t.thresholdHint}</p>
+    <p class="threshold-note">{$t.thresholdHint}</p>
   </div>
 
   <div class="rail-section">

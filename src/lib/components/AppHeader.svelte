@@ -1,6 +1,6 @@
 <!-- src/lib/components/AppHeader.svelte -->
 <script lang="ts">
-  import { t } from '../i18n/en';
+  import { t } from '../i18n';
   export let locationName: string;
 
   const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -8,7 +8,7 @@
 
 <header>
   <div class="left">
-    <span class="app-name">{t.appName}</span>
+    <span class="app-name">{$t.appName}</span>
     <div class="loc-row">
       <span class="dot"></span>
       <span class="loc">{locationName || '…'}</span>

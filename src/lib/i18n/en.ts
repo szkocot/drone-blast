@@ -34,5 +34,3 @@ export const en = {
   languageNames: { auto: 'Auto', en: 'English', pl: 'Polish' } as Record<AppLanguage, string>,
 };
 
-// Temporary backward-compat shim — removed in Task 3
-export const t = en;

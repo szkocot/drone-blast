@@ -1,6 +1,6 @@
 <!-- src/lib/components/SettingsSheet.svelte -->
 <script lang="ts">
-  import { t } from '../i18n/en';
+  import { t } from '../i18n';
   import { convertFromKmh, convertToKmh, thresholdStep } from '../stores/settingsStore';
   import type { Settings, WindUnit, AppAppearance } from '../types';
 
@@ -29,40 +29,40 @@
 <div class="backdrop" on:click={onClose} role="presentation"></div>
 
 <!-- Sheet -->
-<div class="sheet" role="dialog" aria-label={t.settings}>
+<div class="sheet" role="dialog" aria-label={$t.settings}>
   <div class="handle"></div>
 
   <div class="section">
     <div class="row">
       <div>
-        <div class="row-title">{t.windThreshold}</div>
-        <div class="row-hint">{t.thresholdHint}</div>
+        <div class="row-title">{$t.windThreshold}</div>
+        <div class="row-hint">{$t.thresholdHint}</div>
       </div>
       <div class="stepper">
         <button on:click={decrement}>−</button>
-        <span>{displayThreshold.toFixed(0)} {t.units[settings.unit]}</span>
+        <span>{displayThreshold.toFixed(0)} {$t.units[settings.unit]}</span>
         <button on:click={increment}>+</button>
       </div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-label">{t.windSpeedUnit}</div>
+    <div class="section-label">{$t.windSpeedUnit}</div>
     <div class="seg-group">
       {#each units as u}
         <button class:active={settings.unit === u} on:click={() => onChange({ unit: u })}>
-          {t.units[u]}
+          {$t.units[u]}
         </button>
       {/each}
     </div>
   </div>
 
   <div class="section">
-    <div class="section-label">{t.appearance}</div>
+    <div class="section-label">{$t.appearance}</div>
     <div class="seg-group">
       {#each appearances as a}
         <button class:active={settings.appearance === a} on:click={() => onChange({ appearance: a })}>
-          {t.appearances[a]}
+          {$t.appearances[a]}
         </button>
       {/each}
     </div>
@@ -71,8 +71,8 @@
   <div class="section">
     <div class="row">
       <div>
-        <div class="row-title">{t.dataSources}</div>
-        <div class="row-hint">{t.dataSourcesHint}</div>
+        <div class="row-title">{$t.dataSources}</div>
+        <div class="row-hint">{$t.dataSourcesHint}</div>
       </div>
       <span class="sources" class:ok={modelCount === 6}>{modelCount} / 6 {modelCount === 6 ? '✓' : '⚠'}</span>
     </div>
@@ -81,8 +81,8 @@
   <div class="section">
     <div class="row">
       <div>
-        <div class="row-title">{t.refetchRadius}</div>
-        <div class="row-hint">{t.refetchRadiusHint}</div>
+        <div class="row-title">{$t.refetchRadius}</div>
+        <div class="row-hint">{$t.refetchRadiusHint}</div>
       </div>
       <div class="stepper">
         <button on:click={() => onChange({ refetchRadiusKm: Math.max(1, settings.refetchRadiusKm - 1) })}>−</button>
@@ -92,7 +92,7 @@
     </div>
   </div>
 
-  <button class="done-btn" on:click={onClose}>{t.done}</button>
+  <button class="done-btn" on:click={onClose}>{$t.done}</button>
 </div>
 
 <style>

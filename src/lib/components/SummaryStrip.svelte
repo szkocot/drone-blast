@@ -1,6 +1,6 @@
 <!-- src/lib/components/SummaryStrip.svelte -->
 <script lang="ts">
-  import { t } from '../i18n/en';
+  import { t } from '../i18n';
   import { nowAt10m, peakInWindow, bestFlyingWindow } from '../windGrid';
   import { convertFromKmh, windColor } from '../stores/settingsStore';
   import { DISPLAY_HEIGHTS } from '../types';
@@ -28,27 +28,27 @@
 <div class="strip">
   <!-- Now @10m -->
   <div class="card {colorClass(now)}">
-    <span class="label">{t.nowAt10m}</span>
+    <span class="label">{$t.nowAt10m}</span>
     <span class="value">{displaySpeed(now)}</span>
     <span class="sub">{unit === 'kmh' ? 'km/h' : unit === 'ms' ? 'm/s' : 'kn'} {now / thresholdKmh < 0.8 ? '✓' : now / thresholdKmh < 1 ? '⚠' : '✗'}</span>
   </div>
 
   <!-- Peak -->
   <div class="card {peak ? colorClass(peak.speed) : 'green'}">
-    <span class="label">{t.peak} · {peak ? DISPLAY_HEIGHTS[peak.heightIndex] : 0}m</span>
+    <span class="label">{$t.peak} · {peak ? DISPLAY_HEIGHTS[peak.heightIndex] : 0}m</span>
     <span class="value">{peak ? displaySpeed(peak.speed) : '—'}</span>
     <span class="sub">{unit === 'kmh' ? 'km/h' : unit === 'ms' ? 'm/s' : 'kn'}</span>
   </div>
 
   <!-- Best Today -->
   <div class="card {window ? 'green' : 'red'}">
-    <span class="label">{window?.mode === 'lowOnly' ? t.bestLow : t.bestToday}</span>
+    <span class="label">{window?.mode === 'lowOnly' ? $t.bestLow : $t.bestToday}</span>
     {#if window}
       <span class="value">{String(window.startHour).padStart(2,'0')}:00</span>
-      <span class="sub">{t.hWindow(window.duration)}</span>
+      <span class="sub">{$t.hWindow(window.duration)}</span>
     {:else}
       <span class="value">—</span>
-      <span class="sub red-text">{t.noWindow}</span>
+      <span class="sub red-text">{$t.noWindow}</span>
     {/if}
   </div>
 </div>

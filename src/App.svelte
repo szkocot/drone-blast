@@ -1,7 +1,7 @@
 <!-- src/App.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { t } from './lib/i18n/en';
+  import { t } from './lib/i18n';
   import { windGrid, fetchState, hourOffset, fetchWind, locationName } from './lib/stores/windStore';
   import { settingsStore, haversineKm } from './lib/stores/settingsStore';
   import { reverseGeocode } from './lib/services/geocoder';
@@ -61,21 +61,21 @@
     <!-- GPS denied -->
     <div class="full-screen-msg">
       <span class="icon">📍</span>
-      <p>{t.locationRequired}</p>
-      <small>{t.locationHelp}</small>
+      <p>{$t.locationRequired}</p>
+      <small>{$t.locationHelp}</small>
     </div>
   {:else if $fetchState.type === 'loading' || $fetchState.type === 'idle'}
     <!-- Loading -->
     <div class="full-screen-msg">
       <div class="spinner"></div>
-      <p>{t.fetchingForecast}</p>
+      <p>{$t.fetchingForecast}</p>
     </div>
   {:else if $fetchState.type === 'failed'}
     <!-- Error -->
     <div class="full-screen-msg">
       <span class="icon">📡</span>
       <p>{$fetchState.message}</p>
-      <button on:click={requestLocation}>{t.retry}</button>
+      <button on:click={requestLocation}>{$t.retry}</button>
     </div>
   {:else if $fetchState.type === 'loaded' && $windGrid}
     <!-- Main UI -->
@@ -85,7 +85,7 @@
 
         {#if $fetchState.modelCount < 6}
           <ErrorBanner
-            message={t.limitedData($fetchState.modelCount)}
+            message={$t.limitedData($fetchState.modelCount)}
             style="warning"
             onRetry={requestLocation}
           />
