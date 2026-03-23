@@ -30,21 +30,28 @@
 <style>
   .strip {
     display: flex;
-    padding: 4px 0;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 6px;
     background: var(--surface);
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
   }
 
+  .strip::-webkit-scrollbar { display: none; }
+
   .cell {
-    flex: 1;
+    flex: 0 0 34px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 3px 2px;
+    gap: 2px;
+    min-width: 34px;
+    padding: 4px 3px;
     border-radius: 6px;
-    gap: 1px;
-    min-width: 0;
+    scroll-snap-align: start;
   }
 
   .cell.active {
@@ -62,4 +69,20 @@
 
   .icon { font-size: 14px; line-height: 1; }
   .temp { font-size: 10px; font-weight: 700; color: var(--text); }
+
+  @media (min-width: 640px) {
+    .strip {
+      gap: 0;
+      overflow-x: visible;
+      padding: 4px 0;
+    }
+
+    .cell {
+      flex: 1 0 0;
+      min-width: 0;
+      gap: 1px;
+      padding: 3px 2px;
+      scroll-snap-align: none;
+    }
+  }
 </style>

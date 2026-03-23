@@ -20,15 +20,17 @@
 <style>
   header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 16px;
+    gap: 12px;
+    padding: calc(10px + var(--safe-top)) 16px 10px;
     background: var(--surface2);
     border-bottom: 1px solid var(--border);
   }
+  .left     { min-width: 0; }
   .app-name { font-size: 16px; font-weight: 900; color: var(--blue); letter-spacing: 1.5px; }
   .loc-row  { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
   .dot      { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-  .loc      { font-size: 13px; color: var(--text-muted); }
-  .date     { font-size: 13px; color: var(--text-muted); }
+  .loc      { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .date     { font-size: 13px; color: var(--text-muted); flex-shrink: 0; white-space: nowrap; }
 
   @media (min-width: 1024px) {
     header {
