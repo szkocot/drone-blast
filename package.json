@@ -1,7 +1,7 @@
 {
   "name": "fpv-blast",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
     "test:ui": "vitest --ui"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.12.0",

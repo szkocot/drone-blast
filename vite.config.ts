@@ -29,7 +29,7 @@ export default defineConfig(async ({ command }) => {
     base: '/fpv-blast/',
     plugins,
     test: {
-      exclude: ['.worktrees/**', 'node_modules/**', 'dist/**'],
+      exclude: ['.worktrees/**', 'node_modules/**', 'dist/**', 'e2e/**', 'test-results/**'],
       environment: 'jsdom',
       globals: true
     }

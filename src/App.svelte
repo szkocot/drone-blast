@@ -23,9 +23,21 @@
   let lastFetchLat: number | null = null;
   let lastFetchLon: number | null = null;
 
+  // Tracks the location config key at last fetch — empty until onMount fires
+  let _lastFetchedKey = '';
+
   // Open picker automatically when in Custom mode with no saved location
   $: if ($settingsStore.locationMode === 'custom' && !$settingsStore.customLocation && !showLocationPicker) {
     showLocationPicker = true;
+  }
+
+  // Re-fetch when locationMode or customLocation changes after initial mount
+  $: {
+    const key = $settingsStore.locationMode + '|' + JSON.stringify($settingsStore.customLocation);
+    if (_lastFetchedKey && key !== _lastFetchedKey) {
+      _lastFetchedKey = key;
+      requestLocation();
+    }
   }
 
   // Apply theme
@@ -51,15 +63,24 @@
     reverseGeocode(lat, lon).then(name => locationName.set(name));
   }
 
+  function fetchCustomLocation(lat: number, lon: number, name: string) {
+    // Custom/fallback fetches must invalidate the GPS radius cache so
+    // switching back to Auto or recovering GPS triggers a fresh load.
+    lastFetchLat = null;
+    lastFetchLon = null;
+    fetchWind(lat, lon);
+    locationName.set(name);
+  }
+
   function requestLocation() {
     gpsError = false;
     const mode = $settingsStore.locationMode;
+    _lastFetchedKey = mode + '|' + JSON.stringify($settingsStore.customLocation);
     const custom = $settingsStore.customLocation;
 
     if (mode === 'custom') {
       if (custom) {
-        fetchWind(custom.lat, custom.lon);
-        locationName.set(custom.name);
+        fetchCustomLocation(custom.lat, custom.lon, custom.name);
       }
       // No custom location yet — picker will open via reactive statement above
       return;
@@ -69,8 +90,7 @@
     gpsError = false;
     navigator.geolocation.getCurrentPosition(onLocation, () => {
       if (custom) {
-        fetchWind(custom.lat, custom.lon);
-        locationName.set(custom.name);
+        fetchCustomLocation(custom.lat, custom.lon, custom.name);
       } else {
         gpsError = true;
       }
@@ -79,6 +99,7 @@
 
   onMount(() => {
     requestLocation();
+    _lastFetchedKey = $settingsStore.locationMode + '|' + JSON.stringify($settingsStore.customLocation);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') requestLocation();
     });
