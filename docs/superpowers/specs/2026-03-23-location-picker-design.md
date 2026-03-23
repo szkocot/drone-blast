@@ -45,7 +45,7 @@ Full-screen overlay rendered at the App level (not inside the sheet). Layout top
 ```
 
 - **Search**: Nominatim forward geocoding. Results shown in a dropdown below the top bar. Selecting a result flies the map to that location and drops the pin.
-- **Tap-to-place**: tapping anywhere on the map moves the pin (via MapLibre `on('click')` event).
+- **Pan-to-place**: the pin is fixed at the CSS centre of the map. The user pans the map to position the pin over the desired location. Pin coordinates update on every `moveend` event via `map.getCenter()`.
 - **Reverse geocode**: after any pin movement, `reverseGeocode(lat, lon)` updates the bottom bar name. Falls back to `lat°N lon°E` on failure.
 - **Confirm**: saves `{ lat, lon, name }` to `settings.customLocation`, closes the overlay.
 - **Back**: discards changes, closes the overlay.
