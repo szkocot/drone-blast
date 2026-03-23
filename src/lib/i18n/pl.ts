@@ -1,5 +1,5 @@
 // src/lib/i18n/pl.ts
-import type { WindUnit, AppAppearance, AppLanguage } from '../types';
+import type { WindUnit, AppAppearance, AppLanguage, TempUnit } from '../types';
 import type { Translations } from './types';
 
 export const pl: Translations = {
@@ -33,4 +33,7 @@ export const pl: Translations = {
   refetchRadiusHint: 'Przesuń się o tyle przed odświeżeniem pogody',
   language: 'Język',
   languageNames: { auto: 'Auto', en: 'Angielski', pl: 'Polski' } as Record<AppLanguage, string>,
+  temperature: 'Temperatura',
+  tempUnits: { celsius: '°C', fahrenheit: '°F' } as Record<TempUnit, string>,
+  now: 'TERAZ',
 };

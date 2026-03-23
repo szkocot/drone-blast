@@ -14,6 +14,7 @@
   import SettingsSheet   from './lib/components/SettingsSheet.svelte';
   import ErrorBanner     from './lib/components/ErrorBanner.svelte';
   import DesktopUtilityRail from './lib/components/DesktopUtilityRail.svelte';
+  import WeatherStrip from './lib/components/WeatherStrip.svelte';
 
   let showSettings = false;
   let gpsError = false;
@@ -105,6 +106,12 @@
             thresholdKmh={$settingsStore.thresholdKmh}
           />
         </div>
+
+        <WeatherStrip
+          grid={$windGrid}
+          hourOffset={$hourOffset}
+          unit={$settingsStore.tempUnit}
+        />
 
         <TimeSlider
           grid={$windGrid}

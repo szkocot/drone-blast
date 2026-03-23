@@ -1,5 +1,5 @@
 // src/lib/i18n/en.ts
-import type { WindUnit, AppAppearance, AppLanguage } from '../types';
+import type { WindUnit, AppAppearance, AppLanguage, TempUnit } from '../types';
 
 export const en = {
   appName: 'FPV BLAST',
@@ -32,5 +32,8 @@ export const en = {
   refetchRadiusHint: 'Move this far before refreshing weather',
   language: 'Language',
   languageNames: { auto: 'Auto', en: 'English', pl: 'Polish' } as Record<AppLanguage, string>,
+  temperature: 'Temperature',
+  tempUnits: { celsius: '°C', fahrenheit: '°F' } as Record<TempUnit, string>,
+  now: 'NOW',
 };
 
