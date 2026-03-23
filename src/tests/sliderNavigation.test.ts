@@ -5,6 +5,8 @@ describe('nextOffsetFromKey', () => {
   it('moves one hour with arrow keys', () => {
     expect(nextOffsetFromKey('ArrowRight', 12, 144)).toBe(13);
     expect(nextOffsetFromKey('ArrowLeft', 12, 144)).toBe(11);
+    expect(nextOffsetFromKey('ArrowUp', 12, 144)).toBe(13);
+    expect(nextOffsetFromKey('ArrowDown', 12, 144)).toBe(11);
   });
 
   it('moves by six hours with page keys', () => {

@@ -9,8 +9,10 @@ export function nextOffsetFromKey(
 ): number | null {
   switch (key) {
     case 'ArrowLeft':
+    case 'ArrowDown':
       return clamp(current - 1, max);
     case 'ArrowRight':
+    case 'ArrowUp':
       return clamp(current + 1, max);
     case 'PageUp':
       return clamp(current + 6, max);
