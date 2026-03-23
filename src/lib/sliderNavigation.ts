@@ -13,9 +13,9 @@ export function nextOffsetFromKey(
     case 'ArrowRight':
       return clamp(current + 1, max);
     case 'PageUp':
-      return clamp(current - 6, max);
-    case 'PageDown':
       return clamp(current + 6, max);
+    case 'PageDown':
+      return clamp(current - 6, max);
     case 'Home':
       return 0;
     case 'End':

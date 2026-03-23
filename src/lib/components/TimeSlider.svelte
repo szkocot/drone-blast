@@ -22,6 +22,7 @@
 
   $: currentLabel = dayLabel(hourOffset);
   $: fillPct = (hourOffset / MAX_OFFSET) * 100;
+  $: currentValueText = currentLabel ? `Forecast timeline starting ${currentLabel}` : 'Forecast timeline';
 
   function parseRGBA(css: string): [number, number, number, number] {
     const m = css.match(/rgba?\((\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)(?:,\s*([\d.]+))?\)/);
@@ -100,6 +101,7 @@
     on:keydown={onTrackKeydown}
     role="slider"
     aria-label="Forecast timeline"
+    aria-valuetext={currentValueText}
     aria-valuenow={hourOffset}
     aria-valuemin={0}
     aria-valuemax={MAX_OFFSET}
