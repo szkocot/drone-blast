@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 // We test the pure conversion helpers, not the store itself (stores require DOM)
-import { convertFromKmh, convertToKmh, thresholdStep, windColor, haversineKm } from '../lib/stores/settingsStore';
+import { convertFromKmh, convertToKmh, thresholdStep, windColor, haversineKm, convertTemp } from '../lib/stores/settingsStore';
 
 describe('convertFromKmh', () => {
   it('kmh passthrough', () => expect(convertFromKmh(36, 'kmh')).toBeCloseTo(36));
@@ -55,5 +55,17 @@ describe('haversineKm', () => {
 
   it('returns ~252 km between Kraków and Warsaw', () => {
     expect(haversineKm(50.06, 19.94, 52.23, 21.01)).toBeCloseTo(252, -1);
+  });
+});
+
+describe('convertTemp', () => {
+  it('returns celsius unchanged', () => {
+    expect(convertTemp(20, 'celsius')).toBeCloseTo(20);
+  });
+  it('converts 0°C to 32°F', () => {
+    expect(convertTemp(0, 'fahrenheit')).toBeCloseTo(32);
+  });
+  it('converts 100°C to 212°F', () => {
+    expect(convertTemp(100, 'fahrenheit')).toBeCloseTo(212);
   });
 });

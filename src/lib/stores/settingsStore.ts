@@ -1,6 +1,6 @@
 // src/lib/stores/settingsStore.ts
 import { writable } from 'svelte/store';
-import type { Settings, WindUnit } from '../types';
+import type { Settings, WindUnit, TempUnit } from '../types';
 
 const STORAGE_KEY = 'fpvblast-settings';
 
@@ -13,7 +13,7 @@ function load(): Settings {
 }
 
 function defaults(): Settings {
-  return { thresholdKmh: 25, unit: 'kmh', appearance: 'auto', refetchRadiusKm: 5, language: 'auto' };
+  return { thresholdKmh: 25, unit: 'kmh', appearance: 'auto', refetchRadiusKm: 5, language: 'auto', tempUnit: 'celsius' };
 }
 
 const _store = writable<Settings>(load());
@@ -36,6 +36,10 @@ export function convertToKmh(value: number, unit: WindUnit): number {
   if (unit === 'ms')    return value * 3.6;
   if (unit === 'knots') return value * 1.852;
   return value;
+}
+
+export function convertTemp(celsius: number, unit: TempUnit): number {
+  return unit === 'fahrenheit' ? celsius * 9 / 5 + 32 : celsius;
 }
 
 export function thresholdStep(unit: WindUnit): number {
