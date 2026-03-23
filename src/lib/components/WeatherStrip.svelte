@@ -9,10 +9,8 @@
   export let hourOffset: number;
   export let unit: TempUnit;
 
-  $: maxIdx = grid.times.length - 1;
-  $: indices = [-2, -1, 0, 1, 2].map(d =>
-    Math.max(0, Math.min(maxIdx, hourOffset + d))
-  );
+  $: start = Math.max(0, hourOffset);
+  $: indices = Array.from({ length: 24 }, (_, i) => Math.min(start + i, grid.times.length - 1));
 
   function displayTemp(celsius: number): string {
     return convertTemp(celsius, unit).toFixed(0) + (unit === 'fahrenheit' ? '°F' : '°C');
@@ -21,8 +19,8 @@
 
 <div class="strip">
   {#each indices as idx, i}
-    <div class="cell" class:active={i === 2} class:dim={i !== 2}>
-      {#if i === 2}<span class="now-label">{$t.now}</span>{/if}
+    <div class="cell" class:active={i === 0}>
+      {#if i === 0}<span class="now-label">{$t.now}</span>{/if}
       <span class="icon">{weatherIcon(grid.weatherCode[idx])}</span>
       <span class="temp">{displayTemp(grid.temperature[idx])}</span>
     </div>
@@ -32,22 +30,21 @@
 <style>
   .strip {
     display: flex;
-    justify-content: center;
-    gap: 4px;
-    padding: 6px 12px;
+    padding: 4px 0;
     background: var(--surface);
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
   }
 
   .cell {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5px 10px;
-    border-radius: 10px;
-    min-width: 52px;
-    gap: 2px;
+    padding: 3px 2px;
+    border-radius: 6px;
+    gap: 1px;
+    min-width: 0;
   }
 
   .cell.active {
@@ -55,19 +52,14 @@
     border: 1px solid rgba(59, 130, 246, 0.4);
   }
 
-  .cell.dim {
-    opacity: 0.5;
-    border: 1px solid transparent;
-  }
-
   .now-label {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
     color: var(--blue);
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }
 
-  .icon { font-size: 18px; line-height: 1; }
-  .temp { font-size: 11px; font-weight: 700; color: var(--text); }
+  .icon { font-size: 14px; line-height: 1; }
+  .temp { font-size: 10px; font-weight: 700; color: var(--text); }
 </style>
