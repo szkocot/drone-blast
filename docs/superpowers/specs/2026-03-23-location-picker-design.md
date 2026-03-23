@@ -49,11 +49,13 @@ Full-screen overlay rendered at the App level (not inside the sheet). Layout top
 - **Reverse geocode**: after any pin movement, `reverseGeocode(lat, lon)` updates the bottom bar name. Falls back to `lat°N lon°E` on failure.
 - **Confirm**: saves `{ lat, lon, name }` to `settings.customLocation`, closes the overlay.
 - **Back**: discards changes, closes the overlay.
-- **Confirm disabled** if map fails to load.
+- **Confirm disabled** if map fails to load or no location is picked yet.
 
 ---
 
 ## Architecture
+
+**Implementation order:** `types.ts` → `settingsStore.ts` → `geocoder.ts` → `en.ts` + `pl.ts` → `LocationPicker.svelte` → `SettingsSheet.svelte` → `App.svelte`. The `Translations` type is derived from `en.ts` (`typeof en`), so `en.ts` must be updated after `types.ts` is updated.
 
 ### 1. `src/lib/types.ts`
 
@@ -79,14 +81,16 @@ export interface Settings {
   refetchRadiusKm: number;
   language: AppLanguage;
   tempUnit: TempUnit;
-  locationMode: LocationMode;       // NEW
-  customLocation: CustomLocation | null;  // NEW
+  locationMode: LocationMode;            // NEW
+  customLocation: CustomLocation | null; // NEW
 }
 ```
 
 ### 2. `src/lib/stores/settingsStore.ts`
 
 Add `LocationMode` and `CustomLocation` to the import from `'../types'`.
+
+Export `defaults()` (change `function defaults()` to `export function defaults()`).
 
 Add to `defaults()`:
 
@@ -135,15 +139,6 @@ export let onConfirm: (loc: CustomLocation) => void;
 export let onClose: () => void;
 ```
 
-Behaviour:
-
-- `onMount`: initialise MapLibre GL map with OpenFreeMap Liberty style (`https://tiles.openfreemap.org/styles/liberty`). If `initialLocation` is set, fly to it and place the pin. Otherwise centre on `[0, 20]` zoom 2.
-- `onDestroy`: call `map.remove()`.
-- Search input: debounced 400 ms, calls `forwardGeocode(query)`, shows results dropdown. Selecting a result: `map.flyTo({ center: [lon, lat], zoom: 12 })`, update pin and reverse-geocode.
-- Map click: update pin coordinates, call `reverseGeocode`, update `pickedLocation`.
-- Confirm button: calls `onConfirm(pickedLocation)`.
-- MapLibre load error: set `mapError = true`, disable Confirm.
-
 Internal state:
 
 ```ts
@@ -151,16 +146,41 @@ let pickedLocation: CustomLocation | null = initialLocation ?? null;
 let searchQuery = '';
 let searchResults: GeoResult[] = [];
 let mapError = false;
-let map: maplibregl.Map;
+let map: maplibregl.Map | undefined;
 ```
+
+Behaviour:
+
+- `onMount`: initialise MapLibre GL map with OpenFreeMap Liberty style (`https://tiles.openfreemap.org/styles/liberty`). If `initialLocation` is set, fly to it and place the pin. Otherwise centre on `[0, 20]` zoom 2. On map `error` event: set `mapError = true`.
+- `onDestroy`: call `map?.remove()`.
+- Search input: debounced 400 ms, calls `forwardGeocode(query)`, shows results dropdown. Selecting a result: `map.flyTo({ center: [lon, lat], zoom: 12 })`.
+- **Pin tracks map centre** (standard centre-pin pattern): listen to `map.on('moveend', () => { const c = map.getCenter(); reverseGeocode(c.lat, c.lng).then(name => { pickedLocation = { lat: c.lat, lon: c.lng, name }; }); })`. The pin is always at CSS centre; the user pans the map to position it — do **not** use `map.on('click')` to place the pin (that would create a lat/lon mismatch with the visible pin position).
+- Confirm button: disabled when `mapError || !pickedLocation`. On click: calls `onConfirm(pickedLocation)`.
 
 The pin is a fixed `position: absolute` element at the centre of the map container (CSS `50% 50%`), not a MapLibre marker — simpler to style and always stays centred during pan.
 
 ### 5. `src/lib/components/SettingsSheet.svelte`
 
-Add `LocationMode` and `CustomLocation` to the type import.
+Add `LocationMode` and `CustomLocation` to the type import from `'../types'`.
 
-Add `const locationModes: LocationMode[] = ['auto', 'custom']` (display labels from `$t`).
+Add one new exported prop:
+
+```ts
+export let onOpenPicker: () => void;
+```
+
+Add `const locationModes: LocationMode[] = ['auto', 'custom']`.
+
+Add `onLocationModeChange` helper:
+
+```ts
+function onLocationModeChange(lm: LocationMode) {
+  onChange({ locationMode: lm });
+  if (lm === 'custom' && !settings.customLocation) {
+    onOpenPicker();
+  }
+}
+```
 
 Insert a Location section at the top (before Wind Threshold):
 
@@ -186,14 +206,6 @@ Insert a Location section at the top (before Wind Threshold):
 </div>
 ```
 
-`onLocationModeChange(lm)`:
-- Calls `onChange({ locationMode: lm })`.
-- If `lm === 'custom'` and `settings.customLocation === null`: also calls `onOpenPicker()`.
-
-`SettingsSheet` receives two new props:
-- `onOpenPicker: () => void` — called when user wants to open LocationPicker
-- (existing `onChange` handles saving the mode)
-
 ### 6. `src/App.svelte`
 
 Import `LocationPicker`.
@@ -204,7 +216,15 @@ Add state:
 let showLocationPicker = false;
 ```
 
-Render:
+Add a reactive statement so that when the user switches to Custom mode with no saved location (e.g. from a persisted setting on launch), the picker opens automatically. The `!showLocationPicker` guard prevents the statement from re-firing while the picker is already open:
+
+```ts
+$: if ($settingsStore.locationMode === 'custom' && !$settingsStore.customLocation && !showLocationPicker) {
+  showLocationPicker = true;
+}
+```
+
+Render `<LocationPicker>` at the top level (outside all other overlays). When the user presses Back with no custom location saved, `onClose` must revert `locationMode` to `'auto'` to prevent the reactive statement from re-opening the picker immediately:
 
 ```svelte
 {#if showLocationPicker}
@@ -214,21 +234,29 @@ Render:
       settingsStore.update(s => ({ ...s, customLocation: loc }));
       showLocationPicker = false;
     }}
-    onClose={() => { showLocationPicker = false; }}
+    onClose={() => {
+      showLocationPicker = false;
+      if (!$settingsStore.customLocation) {
+        settingsStore.update(s => ({ ...s, locationMode: 'auto' }));
+      }
+    }}
   />
 {/if}
 ```
 
-Pass to `SettingsSheet`:
+Update the `<SettingsSheet>` call to add `onOpenPicker`. All existing props are retained unchanged:
 
 ```svelte
 <SettingsSheet
-  ...
-  onOpenPicker={() => { showLocationPicker = true; }}
+  settings={$settingsStore}
+  modelCount={$fetchState.type === 'loaded' ? $fetchState.modelCount : 0}
+  onClose={() => showSettings = false}
+  onChange={(s) => settingsStore.update(v => ({ ...v, ...s }))}
+  onOpenPicker={() => { showSettings = false; showLocationPicker = true; }}
 />
 ```
 
-Update `requestLocation()`:
+Update `requestLocation()`. The `gpsError = false` reset moves from the top of the function into the Auto branch only. In Custom mode `lastFetchLat`/`lastFetchLon` are intentionally not updated — the haversine radius guard applies to GPS movement only and does not apply to custom locations:
 
 ```ts
 function requestLocation() {
@@ -240,6 +268,7 @@ function requestLocation() {
       fetchWind(custom.lat, custom.lon);
       locationName.set(custom.name);
     }
+    // No custom location yet — picker will open via reactive statement above
     return;
   }
 
@@ -256,11 +285,11 @@ function requestLocation() {
 }
 ```
 
-Remove the `gpsError = false` reset from the top of `requestLocation` — it is now inside the Auto branch only.
-
 ### 7. `src/lib/i18n/en.ts`
 
-Add `LocationMode` and `CustomLocation` to the import. Add:
+Add `LocationMode` to the import from `'../types'` (`CustomLocation` is not needed here).
+
+Add to the `en` object:
 
 ```ts
 location: 'Location',
@@ -272,7 +301,9 @@ chooseLocation: 'Choose Location',
 
 ### 8. `src/lib/i18n/pl.ts`
 
-Add `LocationMode` and `CustomLocation` to the import. Add:
+Add `LocationMode` to the import from `'../types'` (`CustomLocation` is not needed here).
+
+Add to the `pl` object:
 
 ```ts
 location: 'Lokalizacja',
@@ -289,15 +320,16 @@ chooseLocation: 'Wybierz lokalizację',
 ```
 Settings.locationMode === 'auto'
   → navigator.geolocation → onLocation(pos) → fetchWind(lat, lon)
-  → on error: customLocation set? → fetchWind(custom.lat, custom.lon)
-  → on error: no custom → gpsError = true
+  → on GPS error: customLocation set? → fetchWind(custom.lat, custom.lon) silently
+  → on GPS error: no custom → gpsError = true
 
 Settings.locationMode === 'custom'
-  → fetchWind(customLocation.lat, customLocation.lon) directly
+  → custom set? → fetchWind(custom.lat, custom.lon) directly
+  → custom null? → reactive statement opens LocationPicker
 
 LocationPicker
-  → search: forwardGeocode(query) → fly map → reverseGeocode → pickedLocation
-  → tap map: reverseGeocode → pickedLocation
+  → search: forwardGeocode(query) → map.flyTo → moveend → reverseGeocode → pickedLocation
+  → pan map: map 'moveend' → map.getCenter() → reverseGeocode → pickedLocation
   → Confirm: onConfirm(pickedLocation) → settingsStore.update → showLocationPicker = false
 ```
 
@@ -325,9 +357,9 @@ OpenFreeMap style URL: `https://tiles.openfreemap.org/styles/liberty`
 |----------|-----------|
 | Auto mode, GPS denied, custom set | Use custom location silently |
 | Auto mode, GPS denied, no custom | Show existing GPS error |
-| Custom mode, no location saved | Open LocationPicker immediately |
-| MapLibre fails to load | Show error message in picker, Confirm disabled |
-| Nominatim search fails | Show "No results", user can still tap map |
+| Custom mode, no location saved | Reactive statement opens LocationPicker |
+| MapLibre fails to load | `mapError = true`; Confirm disabled; error message shown |
+| Nominatim search fails | Show "No results"; user can still tap map |
 | Reverse geocode fails | Show raw coords (`52.23°N 21.01°E`) |
 
 ---
@@ -339,4 +371,4 @@ Existing 69 tests must continue to pass. New unit tests:
 | What | Where | Cases |
 |------|-------|-------|
 | `forwardGeocode()` | `src/tests/geocoder.test.ts` (new file) | Returns mapped results on success; returns `[]` on HTTP error; returns `[]` on network throw |
-| Settings defaults | `src/tests/settingsStore.test.ts` | `locationMode` defaults to `'auto'`; `customLocation` defaults to `null` |
+| Settings defaults | `src/tests/settingsStore.test.ts` | Import `defaults` from `settingsStore` (now exported); assert `defaults().locationMode === 'auto'`; assert `defaults().customLocation === null` |
