@@ -16,7 +16,7 @@ A wind forecast PWA for FPV drone pilots. Shows a 7-day wind speed heatmap acros
 
 ## Live App
 
-👉 **https://szymonkocot.github.io/fpv-blast/**
+👉 **https://droneblast.ovh/**
 
 ## Tech Stack
 
