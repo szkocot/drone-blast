@@ -9,7 +9,7 @@
 
 This design blends the strongest parts of two explored directions:
 
-1. **Preserve the current product rhythm** — FPV Blast remains a one-screen, heatmap-first flight decision tool.
+1. **Preserve the current product rhythm** — Drone Blast remains a one-screen, heatmap-first flight decision tool.
 2. **Promote controls into first-class UI** — the current low-visibility settings gear is replaced with an obvious, touch-sized, labeled control.
 3. **Make desktop intentional** — desktop uses a two-column layout with a right utility rail instead of behaving like a stretched mobile screen.
 
@@ -30,7 +30,7 @@ Use the familiar dark field-tool visual language from the current UI, but borrow
 - The timeline slider remains directly below the chart and continues to control the same windowing behavior.
 - Visual polish focuses on spacing, grouping, control affordance, and readability instead of adding decorative chrome.
 
-This keeps FPV Blast recognizable while addressing the current “utility leftovers” feel in the control layer.
+This keeps Drone Blast recognizable while addressing the current “utility leftovers” feel in the control layer.
 
 ---
 

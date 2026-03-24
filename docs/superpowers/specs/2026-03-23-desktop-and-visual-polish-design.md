@@ -7,7 +7,7 @@
 
 ## Overview
 
-Three coordinated changes to FPV Blast:
+Three coordinated changes to Drone Blast:
 
 1. **Desktop layout** — remove the 480 px width cap so the app fills the browser on desktop/laptop screens.
 2. **Heatmap rendering** — replace solid rectangles with rounded, gapless cells rendered with a 2-D bilinear gradient (smooth blending across both height and time axes).

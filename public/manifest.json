@@ -1,6 +1,6 @@
 {
-  "name": "FPV Blast",
-  "short_name": "FPV Blast",
+  "name": "Drone Blast",
+  "short_name": "Drone Blast",
   "description": "Wind forecast heatmap for FPV pilots",
   "start_url": "/fpv-blast/",
   "display": "standalone",

@@ -1,4 +1,4 @@
-# FPV Blast
+# Drone Blast
 
 A wind forecast PWA for FPV drone pilots. Shows a 7-day wind speed heatmap across 18 altitude layers (10–180 m) so you can instantly see when and where it's safe to fly.
 
