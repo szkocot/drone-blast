@@ -49,6 +49,7 @@ export function buildGrid(models: ModelData[], times: Date[]): WindGrid {
   const data: number[][] = [];
   const temperature: number[] = [];
   const weatherCode: number[] = [];
+  const windGust: number[] = [];
 
   for (let t = 0; t < hourCount; t++) {
     const avg10  = mean(removeOutliers(models.map(m => m.at10m[t]  ?? 0)));
@@ -65,9 +66,10 @@ export function buildGrid(models: ModelData[], times: Date[]): WindGrid {
 
     temperature.push(mean(removeOutliers(models.map(m => m.temperature[t] ?? 0))));
     weatherCode.push(mode(models.map(m => m.weatherCode[t] ?? 0)));
+    windGust.push(mean(removeOutliers(models.map(m => m.windGust[t] ?? 0))));
   }
 
-  return { data, times, modelCount: models.length, temperature, weatherCode, windGust: [] }; // stub — populated in Task 3
+  return { data, times, modelCount: models.length, temperature, weatherCode, windGust };
 }
 
 function interpolateWind(h: number, v10: number, v80: number, v120: number, v180: number): number {

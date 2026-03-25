@@ -112,4 +112,19 @@ describe('buildGrid', () => {
     const grid = buildGrid([makeModelData(10)], times);
     expect(grid.weatherCode).toHaveLength(2);
   });
+
+  it('includes windGust array of correct length', () => {
+    const times = [new Date(), new Date(Date.now() + 3600000)];
+    const grid = buildGrid([makeModelData(10)], times);
+    expect(grid.windGust).toHaveLength(2);
+  });
+
+  it('averages windGust across models', () => {
+    const times = [new Date()];
+    const grid = buildGrid([
+      { at10m: [10], at80m: [10], at120m: [10], at180m: [10], temperature: [15], weatherCode: [0], windGust: [10] },
+      { at10m: [20], at80m: [20], at120m: [20], at180m: [20], temperature: [15], weatherCode: [0], windGust: [20] },
+    ], times);
+    expect(grid.windGust[0]).toBeCloseTo(15);
+  });
 });
