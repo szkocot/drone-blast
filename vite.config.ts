@@ -26,7 +26,7 @@ export default defineConfig(async ({ command }) => {
   }
 
   return {
-    base: '/',
+    base: process.env.VITE_BASE_PATH ?? '/',
     plugins,
     test: {
       exclude: ['.worktrees/**', 'node_modules/**', 'dist/**', 'e2e/**', 'test-results/**'],
