@@ -8,6 +8,7 @@ export interface ModelData {
   at180m:      number[];
   temperature: number[];
   weatherCode: number[];
+  windGust:    number[];
 }
 
 export function removeOutliers(values: number[]): number[] {
@@ -66,7 +67,7 @@ export function buildGrid(models: ModelData[], times: Date[]): WindGrid {
     weatherCode.push(mode(models.map(m => m.weatherCode[t] ?? 0)));
   }
 
-  return { data, times, modelCount: models.length, temperature, weatherCode, windGust: [] };
+  return { data, times, modelCount: models.length, temperature, weatherCode, windGust: [] }; // stub — populated in Task 3
 }
 
 function interpolateWind(h: number, v10: number, v80: number, v120: number, v180: number): number {
