@@ -222,7 +222,7 @@
   }
 
   .kp-num { font-size: 11px; font-weight: 700; line-height: 1; }
-  .kp-time { font-size: 9px; color: var(--text-muted); line-height: 1; min-height: 11px; }
+  .kp-time { font-size: 10px; color: var(--text); line-height: 1; min-height: 12px; font-weight: 600; }
   .kp-now-label { color: var(--blue); font-weight: 700; }
 
   .day-sep {
@@ -240,8 +240,9 @@
     position: absolute;
     bottom: -1px;
     left: 3px;
-    font-size: 7px;
-    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
     white-space: nowrap;
   }
 
