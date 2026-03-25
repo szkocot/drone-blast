@@ -274,13 +274,12 @@
     gap: 1px;
     padding: 3px 2px;
     border-radius: 5px;
-    box-sizing: border-box;
-    width: 100%;
+    border: 1px solid transparent;
   }
 
   .cell.active {
     background: rgba(59, 130, 246, 0.15);
-    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-color: rgba(59, 130, 246, 0.4);
   }
 
   .col-label {
