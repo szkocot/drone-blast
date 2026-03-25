@@ -819,6 +819,10 @@ This task rewrites WeatherStrip to add three new props, the gusts row, and the K
 </style>
 ```
 
+> **Note:** The component interface here intentionally differs from the spec's draft. The spec sketched a separate `windGust: number[]` prop and kept `unit: TempUnit` — this plan reads `grid.windGust` directly (simpler) and renames `unit` → `tempUnit` to avoid collision with `windUnit`. The plan's Task 8 wiring is the authoritative reference; ignore the spec's `App.svelte` snippet.
+
+> **No commit in this task** — `WeatherStrip.svelte` is committed together with `App.svelte` in Task 8, Step 5.
+
 - [ ] **Step 2: Run type-check**
 
 ```bash
