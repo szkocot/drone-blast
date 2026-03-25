@@ -48,4 +48,9 @@ export const pl: Translations = {
   threshold: 'Próg',
   legend: 'Legenda',
   legendNoFly: 'Zakaz lotu',
+  gustsAt10m: 'Porywy @ 10m',
+  kpQuiet: 'Spokojnie',
+  kpActive: 'Aktywnie',
+  kpStorm: 'Burza',
+  kpForecast: 'Prognoza Kp — 3 dni',
 };

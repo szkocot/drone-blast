@@ -47,5 +47,10 @@ export const en = {
   threshold: 'Threshold',
   legend: 'Legend',
   legendNoFly: 'No-fly',
+  gustsAt10m: 'Gusts @ 10m',
+  kpQuiet: 'Quiet',
+  kpActive: 'Active',
+  kpStorm: 'Storm',
+  kpForecast: 'Kp forecast — 3 days',
 };
 
