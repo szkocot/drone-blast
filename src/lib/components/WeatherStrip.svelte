@@ -77,7 +77,9 @@
       <div class="kp-bars">
         {#each kpData as entry, i}
           {#if isNewDay(i)}
-            <div class="day-sep"></div>
+            <div class="day-sep">
+              <span class="day-label">{entry.time.toLocaleDateString([], { weekday: 'short' })}</span>
+            </div>
           {/if}
           <div class="kp-bar-wrap" class:kp-now={entry === currentKp}>
             <span class="kp-num" style="color: {kpColor(entry.kp)}">{entry.kp.toFixed(0)}</span>
@@ -85,7 +87,13 @@
               class="kp-bar"
               style="height: {Math.max(4, (entry.kp / 9) * 100)}%; background: {kpColor(entry.kp)}; opacity: 0.5"
             ></div>
-            <span class="kp-time">{entry === currentKp ? 'now' : entry.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            {#if entry === currentKp}
+              <span class="kp-time kp-now-label">now</span>
+            {:else if entry.time.getUTCHours() === 12}
+              <span class="kp-time">{entry.time.toLocaleDateString([], { weekday: 'short' })}</span>
+            {:else}
+              <span class="kp-time"></span>
+            {/if}
           </div>
         {/each}
       </div>
@@ -182,11 +190,16 @@
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    height: 44px;
+    height: 64px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
   }
 
+  .kp-bars::-webkit-scrollbar { display: none; }
+
   .kp-bar-wrap {
-    flex: 1;
+    flex: 0 0 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -207,15 +220,28 @@
     min-height: 4px;
   }
 
-  .kp-num { font-size: 7px; font-weight: 700; line-height: 1; }
-  .kp-time { font-size: 6px; color: var(--text-muted); line-height: 1; }
+  .kp-num { font-size: 9px; font-weight: 700; line-height: 1; }
+  .kp-time { font-size: 7px; color: var(--text-muted); line-height: 1; min-height: 9px; }
+  .kp-now-label { color: var(--blue); font-weight: 700; }
 
   .day-sep {
     width: 1px;
+    min-width: 1px;
     height: 100%;
     background: var(--border);
     flex-shrink: 0;
     align-self: stretch;
+    position: relative;
+    overflow: visible;
+  }
+
+  .day-label {
+    position: absolute;
+    bottom: -1px;
+    left: 3px;
+    font-size: 7px;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
   /* Shared scroll container — single overflow-x:auto wraps both rows */
@@ -266,7 +292,7 @@
   .temp { font-size: 10px; font-weight: 700; color: var(--text); }
 
   .gust-cell { border-radius: 5px; }
-  .gust-val  { font-size: 9px; font-weight: 700; color: var(--text); }
+  .gust-val  { font-size: 10px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.45); }
 
   @media (min-width: 640px) {
     .rows-scroll {
