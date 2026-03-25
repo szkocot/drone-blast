@@ -113,13 +113,13 @@
           <span class="icon">{weatherIcon(grid.weatherCode[idx])}</span>
           <span class="temp">{displayTemp(grid.temperature[idx])}</span>
         </div>
-        <!-- Gust cell (middle) -->
+        <!-- Gust cell (bottom) -->
         <div class="cell gust-cell" class:active={i === 0}
              style="background: {windColor(grid.windGust[idx], thresholdKmh)}">
           <span class="gust-val">{displayGust(grid.windGust[idx])}</span>
         </div>
-        <!-- NOW label below both cells -->
-        {#if i === 0}<span class="now-label">{$t.now}</span>{/if}
+        <!-- Fixed-height label slot — keeps all columns the same height -->
+        <span class="col-label">{i === 0 ? $t.now : ''}</span>
       </div>
     {/each}
   </div>
@@ -274,6 +274,8 @@
     gap: 1px;
     padding: 3px 2px;
     border-radius: 5px;
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .cell.active {
@@ -281,13 +283,14 @@
     border: 1px solid rgba(59, 130, 246, 0.4);
   }
 
-  .now-label {
+  .col-label {
+    height: 11px;
     font-size: 8px;
     font-weight: 700;
     color: var(--blue);
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    align-self: center;
+    text-align: center;
   }
 
   .icon { font-size: 14px; line-height: 1; }
