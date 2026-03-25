@@ -10,6 +10,7 @@ function makeGrid(value: number, hours = 48): WindGrid {
     modelCount: 6,
     temperature: Array(hours).fill(15),
     weatherCode: Array(hours).fill(0),
+    windGust: Array(hours).fill(0),
   };
 }
 

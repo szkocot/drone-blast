@@ -66,7 +66,7 @@ export function buildGrid(models: ModelData[], times: Date[]): WindGrid {
     weatherCode.push(mode(models.map(m => m.weatherCode[t] ?? 0)));
   }
 
-  return { data, times, modelCount: models.length, temperature, weatherCode };
+  return { data, times, modelCount: models.length, temperature, weatherCode, windGust: [] };
 }
 
 function interpolateWind(h: number, v10: number, v80: number, v120: number, v180: number): number {

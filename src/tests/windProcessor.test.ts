@@ -59,6 +59,7 @@ describe('buildGrid', () => {
     at180m:      Array(2).fill(val * 4),
     temperature: Array(2).fill(20),
     weatherCode: Array(2).fill(0),
+    windGust:    Array(2).fill(val),
   });
 
   it('produces 18 heights per time step', () => {
@@ -86,6 +87,7 @@ describe('buildGrid', () => {
     const grid = buildGrid([{
       at10m: [10], at80m: [80], at120m: [120], at180m: [180],
       temperature: [15], weatherCode: [0],
+      windGust: [12],
     }], times);
     expect(grid.data[0][1]).toBeCloseTo(20, 0);
   });
@@ -93,8 +95,8 @@ describe('buildGrid', () => {
   it('averages multiple models', () => {
     const times = [new Date()];
     const grid = buildGrid([
-      { at10m: [10], at80m: [10], at120m: [10], at180m: [10], temperature: [15], weatherCode: [0] },
-      { at10m: [20], at80m: [20], at120m: [20], at180m: [20], temperature: [15], weatherCode: [0] },
+      { at10m: [10], at80m: [10], at120m: [10], at180m: [10], temperature: [15], weatherCode: [0], windGust: [10] },
+      { at10m: [20], at80m: [20], at120m: [20], at180m: [20], temperature: [15], weatherCode: [0], windGust: [20] },
     ], times);
     expect(grid.data[0][0]).toBeCloseTo(15); // mean of 10 and 20
   });

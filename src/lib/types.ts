@@ -19,7 +19,15 @@ export interface WindGrid {
   modelCount: number;
   temperature: number[];
   weatherCode: number[];
+  windGust: number[];  // 168 entries, km/h at 10m
 }
+
+export interface KpEntry {
+  time: Date;
+  kp: number;
+}
+
+export type KpData = KpEntry[];
 
 export interface FlyingWindow {
   startHour: number;
