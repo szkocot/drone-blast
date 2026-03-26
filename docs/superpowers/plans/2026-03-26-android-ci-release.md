@@ -6,7 +6,7 @@
 
 **Architecture:** Two files change — `android/app/build.gradle` gains a signing config that reads credentials from env vars, and a new workflow YAML orchestrates the full build pipeline (Node → Vite → cap sync → Gradle → GitHub Release).
 
-**Tech Stack:** GitHub Actions, Gradle (Groovy DSL), AGP 8.13.0, JDK 17, `softprops/action-gh-releases@v2`
+**Tech Stack:** GitHub Actions, Gradle (Groovy DSL), AGP 8.13.0, JDK 17, `softprops/action-gh-release@v2`
 
 ---
 
@@ -153,7 +153,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload APK to GitHub Release
-        uses: softprops/action-gh-releases@v2
+        uses: softprops/action-gh-release@v2
         with:
           files: android/app/build/outputs/apk/release/app-release.apk
 ```

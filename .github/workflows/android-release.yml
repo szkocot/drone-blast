@@ -34,18 +34,18 @@ jobs:
         run: npx cap sync android
 
       - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/drone-blast.keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/drone-blast.keystore"
 
       - name: Build release APK
         working-directory: android
         run: ./gradlew assembleRelease
         env:
-          KEYSTORE_PATH: /tmp/drone-blast.keystore
+          KEYSTORE_PATH: ${{ runner.temp }}/drone-blast.keystore
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload APK to GitHub Release
-        uses: softprops/action-gh-releases@v2
+        uses: softprops/action-gh-release@v2
         with:
           files: android/app/build/outputs/apk/release/app-release.apk
