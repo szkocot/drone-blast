@@ -49,7 +49,7 @@ export interface Settings {
 export type FetchState =
   | { type: 'idle' }
   | { type: 'loading' }
-  | { type: 'loaded'; modelCount: number }
+  | { type: 'loaded'; modelCount: number; fromCache?: boolean }
   | { type: 'failed'; message: string };
 
 export const DISPLAY_HEIGHTS = Array.from({ length: 18 }, (_, i) => (i + 1) * 10); // [10,20,...,180]
