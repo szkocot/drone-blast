@@ -1,0 +1,260 @@
+# Drone Blast Rename + Capacitor Android Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Complete rename from "FPV Blast" to "Drone Blast" in all remaining files, then add Capacitor to produce a buildable Android APK.
+
+**Architecture:** Six files get text-only renames; Capacitor is then installed as a thin wrapper that copies `dist/` into a native Android WebView shell. No app logic changes.
+
+**Tech Stack:** Svelte 5, Vite 8, `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`
+
+---
+
+## Files touched
+
+| File | Change |
+|------|--------|
+| `package.json` | rename + add Capacitor deps + add `build:android` script |
+| `package-lock.json` | updated automatically by `npm install` |
+| `src/lib/stores/settingsStore.ts` | STORAGE_KEY rename |
+| `playwright.config.ts` | remove stale `/fpv-blast/` path segment from baseURL |
+| `e2e/location-mode-refetch.spec.ts` | BASE constant + localStorage key |
+| `README.md` | git clone URL + `cd` command |
+| `capacitor.config.ts` | new file — Capacitor configuration |
+
+---
+
+## Task 1: Rename package.json
+
+**Files:**
+- Modify: `package.json`
+
+- [ ] **Step 1: Edit name field**
+
+In `package.json` line 2, change:
+```json
+"name": "fpv-blast",
+```
+to:
+```json
+"name": "drone-blast",
+```
+
+- [ ] **Step 2: Verify no tests broken**
+
+```bash
+npm test -- --run
+```
+Expected: all tests pass (this change has no runtime effect).
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add package.json
+git commit -m "chore: rename package to drone-blast"
+```
+
+---
+
+## Task 2: Rename settings storage key
+
+**Files:**
+- Modify: `src/lib/stores/settingsStore.ts:5`
+
+- [ ] **Step 1: Update STORAGE_KEY**
+
+In `src/lib/stores/settingsStore.ts` line 5, change:
+```ts
+const STORAGE_KEY = 'fpvblast-settings';
+```
+to:
+```ts
+const STORAGE_KEY = 'droneblast-settings';
+```
+
+- [ ] **Step 2: Run tests**
+
+```bash
+npm test -- --run
+```
+Expected: all tests pass. The settingsStore tests mock localStorage so they're unaffected by the key name.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/lib/stores/settingsStore.ts
+git commit -m "chore: rename localStorage key to droneblast-settings"
+```
+
+---
+
+## Task 3: Update Playwright config and e2e test
+
+**Files:**
+- Modify: `playwright.config.ts:6`
+- Modify: `e2e/location-mode-refetch.spec.ts:3,18`
+
+- [ ] **Step 1: Fix playwright.config.ts baseURL**
+
+In `playwright.config.ts` line 6, change:
+```ts
+baseURL: 'https://localhost:5175/fpv-blast/',
+```
+to:
+```ts
+baseURL: 'https://localhost:5175/',
+```
+
+- [ ] **Step 2: Fix e2e test BASE constant**
+
+In `e2e/location-mode-refetch.spec.ts` line 3, change:
+```ts
+const BASE = 'https://localhost:5175/fpv-blast/';
+```
+to:
+```ts
+const BASE = 'https://localhost:5175/';
+```
+
+- [ ] **Step 3: Fix e2e test localStorage key**
+
+In `e2e/location-mode-refetch.spec.ts` line 18, change:
+```ts
+localStorage.setItem('fpvblast-settings', JSON.stringify({
+```
+to:
+```ts
+localStorage.setItem('droneblast-settings', JSON.stringify({
+```
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add playwright.config.ts e2e/location-mode-refetch.spec.ts
+git commit -m "chore: update e2e base URL and storage key to drone-blast"
+```
+
+---
+
+## Task 4: Update README
+
+**Files:**
+- Modify: `README.md:36-37`
+
+- [ ] **Step 1: Fix git clone URL and cd command**
+
+In `README.md` lines 36–37, change:
+```bash
+git clone https://github.com/szymonkocot/fpv-blast.git
+cd fpv-blast
+```
+to:
+```bash
+git clone https://github.com/szymonkocot/drone-blast.git
+cd drone-blast
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add README.md
+git commit -m "docs: update README clone URL to drone-blast"
+```
+
+---
+
+## Task 5: Install Capacitor and create config
+
+**Files:**
+- Modify: `package.json` (deps + script)
+- Create: `capacitor.config.ts`
+
+- [ ] **Step 1: Install Capacitor packages**
+
+```bash
+npm install @capacitor/core @capacitor/android
+npm install --save-dev @capacitor/cli
+```
+
+Expected: `package.json` and `package-lock.json` updated, no errors.
+
+- [ ] **Step 2: Add build:android script to package.json**
+
+In `package.json`, add to the `"scripts"` section:
+```json
+"build:android": "vite build && cap sync android"
+```
+
+- [ ] **Step 3: Create capacitor.config.ts**
+
+Create `capacitor.config.ts` at project root:
+```ts
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.droneblast.app',
+  appName: 'Drone Blast',
+  webDir: 'dist',
+};
+
+export default config;
+```
+
+- [ ] **Step 4: Run unit tests to confirm nothing broken**
+
+```bash
+npm test -- --run
+```
+Expected: all tests pass.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add package.json package-lock.json capacitor.config.ts
+git commit -m "feat: add Capacitor Android configuration"
+```
+
+---
+
+## Task 6: Scaffold Android project
+
+**Files:**
+- Create: `android/` directory (generated by Capacitor CLI)
+
+- [ ] **Step 1: Build the web app first**
+
+```bash
+npm run build
+```
+Expected: `dist/` populated. Capacitor needs this to exist before `cap add android`.
+
+- [ ] **Step 2: Scaffold Android project**
+
+```bash
+npx cap add android
+```
+Expected: `android/` directory created with a standard Gradle project. Output ends with something like `✔ Adding native android project in android in 103.07ms`.
+
+- [ ] **Step 3: Verify sync works**
+
+```bash
+npx cap sync android
+```
+Expected: copies `dist/` into `android/app/src/main/assets/public/`. Output ends with `✔ Syncing Capacitor project`.
+
+- [ ] **Step 4: Commit the android scaffold**
+
+```bash
+git add android/
+git commit -m "feat: scaffold Capacitor Android project"
+```
+
+Note: The `android/` directory is large but should be committed — it contains the Gradle wrapper, manifests, and Capacitor bridge code that are needed to open the project in Android Studio.
+
+---
+
+## Final verification
+
+- [ ] Run `npm test -- --run` — all unit tests pass
+- [ ] Run `npm run build:android` — builds `dist/` and syncs to Android
+- [ ] Open Android Studio: File → Open → select `android/` folder → wait for Gradle sync → Build → Make Project (should succeed with no errors)
