@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Drone Blast</string>
+    <string name="title_activity_main">Drone Blast</string>
+    <string name="package_name">com.droneblast.app</string>
+    <string name="custom_url_scheme">com.droneblast.app</string>
+</resources>
