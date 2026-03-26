@@ -20,7 +20,7 @@
 
   let showSettings = false;
   let showLocationPicker = false;
-  let gpsError = false;
+
   let lastFetchLat: number | null = null;
   let lastFetchLon: number | null = null;
 
@@ -74,7 +74,7 @@
   }
 
   function requestLocation() {
-    gpsError = false;
+
     const mode = $settingsStore.locationMode;
     _lastFetchedKey = mode + '|' + JSON.stringify($settingsStore.customLocation);
     const custom = $settingsStore.customLocation;
@@ -88,12 +88,12 @@
     }
 
     // Auto mode
-    gpsError = false;
+
     navigator.geolocation.getCurrentPosition(onLocation, () => {
       if (custom) {
         fetchCustomLocation(custom.lat, custom.lon, custom.name);
       } else {
-        gpsError = true;
+        fetchCustomLocation(50.2965, 18.9546, 'Chorzów, Poland');
       }
     });
   }
@@ -109,14 +109,7 @@
 </script>
 
 <div class="app-shell">
-  {#if gpsError}
-    <!-- GPS denied -->
-    <div class="full-screen-msg">
-      <span class="icon">📍</span>
-      <p>{$t.locationRequired}</p>
-      <small>{$t.locationHelp}</small>
-    </div>
-  {:else if $fetchState.type === 'loading' || $fetchState.type === 'idle'}
+  {#if $fetchState.type === 'loading' || $fetchState.type === 'idle'}
     <!-- Loading -->
     <div class="full-screen-msg">
       <div class="spinner"></div>
