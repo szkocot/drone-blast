@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:android": "vite build && cap sync android",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "test": "vitest run",
     "test:ui": "vitest --ui"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.3.0",
     "@playwright/test": "^1.58.2",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tsconfig/svelte": "^5.0.8",
@@ -28,6 +30,8 @@
     "vitest": "^4.1.0"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
     "maplibre-gl": "^5.21.0"
   }
 }
