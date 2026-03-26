@@ -45,7 +45,12 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload APK to GitHub Release
+      - name: Zip web dist
+        run: zip -r drone-blast-web.zip dist
+
+      - name: Upload APK and zip to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: android/app/build/outputs/apk/release/app-release.apk
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+            drone-blast-web.zip
