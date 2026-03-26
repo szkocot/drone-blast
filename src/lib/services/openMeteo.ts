@@ -37,8 +37,17 @@ export function decodeResponse(json: any): DecodedModel {
 export async function fetchModel(lat: number, lon: number, model: string): Promise<DecodedModel> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 8000);
+
+  // Hard deadline via Promise.race — guards against AbortController not firing on some Android WebViews
+  const hard = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('timeout')), 9000)
+  );
+
   try {
-    const res = await fetch(buildUrl(lat, lon, model), { signal: controller.signal });
+    const res = await Promise.race([
+      fetch(buildUrl(lat, lon, model), { signal: controller.signal }),
+      hard,
+    ]);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return decodeResponse(await res.json());
   } finally {

@@ -95,7 +95,7 @@
       } else {
         fetchCustomLocation(50.2965, 18.9546, 'Chorzów, Poland');
       }
-    });
+    }, { timeout: 10000 });
   }
 
   onMount(() => {
