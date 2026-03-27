@@ -12,14 +12,14 @@ describe('icon artwork sources', () => {
 
     expect(svg).not.toContain('DRONE');
     expect(svg).not.toContain('BLAST');
-    expect(svg.toLowerCase()).toContain(BACKGROUND_COLOR);
-    expect(svg).toContain('viewBox="0 0 172.97 172.97"');
+    expect(svg.toLowerCase()).toContain('fill:black');
+    expect(svg).toContain('viewBox="0 0 161.84 161.84"');
   });
 
   it('uses the full-logo source for the main icon artwork', () => {
     const svg = getMainIconSvg();
 
-    expect(svg.toLowerCase()).toContain(BACKGROUND_COLOR);
+    expect(svg.toLowerCase()).toContain('fill:black');
     expect(svg).toContain('viewBox="0 0 176.43 176.43"');
     expect(svg).toContain('fill-rule:nonzero');
   });
