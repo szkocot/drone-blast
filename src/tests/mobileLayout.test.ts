@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 function compiledCss(path: string): string {
   const source = readFileSync(path, 'utf8');
-  return compile(source, { filename: path }).css.code;
+  return compile(source, { filename: path }).css?.code ?? '';
 }
 
 describe('mobile layout regressions', () => {

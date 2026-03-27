@@ -1,68 +1,73 @@
 /**
- * Generate PWA icon PNGs from an emoji SVG using sharp.
+ * Generate web and Android app icons from the shared Drone Blast SVG artwork.
  * Run: node scripts/gen-icons.mjs
  */
 import sharp from 'sharp';
-import { writeFileSync, mkdirSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { BACKGROUND_COLOR, buildIconSvg } from './icon-artwork.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
 
-// SVG icon: dark background + wind & drone emoji rendered via system font
-function makeSvg(size) {
-  const pad = Math.round(size * 0.12);
-  const inner = size - pad * 2;
-  const cx = size / 2;
-  const cy = size / 2;
-  // Drone body + rotors drawn in app blue/green tones so it looks great on dark bg
-  const r = inner / 2;
-  // Simple stylised quadcopter: 4 arms + 4 rotors + central body
-  const arm = r * 0.38;
-  const rotorR = r * 0.3;
-  const bodyR = r * 0.22;
-  const stroke = r * 0.07;
-  // Wind streaks on left side
-  const w1y = cy - r * 0.22;
-  const w2y = cy;
-  const w3y = cy + r * 0.22;
-  const wLen = r * 0.45;
-  const wX = cx - r * 0.72;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-  <rect width="${size}" height="${size}" rx="${Math.round(size * 0.22)}" fill="#0d0d1a"/>
-  <!-- wind streaks -->
-  <line x1="${wX}" y1="${w1y}" x2="${wX + wLen}" y2="${w1y}" stroke="#4a9eff" stroke-width="${stroke * 0.8}" stroke-linecap="round" opacity="0.7"/>
-  <line x1="${wX - r*0.08}" y1="${w2y}" x2="${wX + wLen * 0.85}" y2="${w2y}" stroke="#4a9eff" stroke-width="${stroke}" stroke-linecap="round"/>
-  <line x1="${wX}" y1="${w3y}" x2="${wX + wLen * 0.7}" y2="${w3y}" stroke="#4a9eff" stroke-width="${stroke * 0.8}" stroke-linecap="round" opacity="0.7"/>
-  <!-- drone arms -->
-  <line x1="${cx}" y1="${cy}" x2="${cx + arm}" y2="${cy - arm}" stroke="#e0e0e0" stroke-width="${stroke}" stroke-linecap="round"/>
-  <line x1="${cx}" y1="${cy}" x2="${cx + arm}" y2="${cy + arm}" stroke="#e0e0e0" stroke-width="${stroke}" stroke-linecap="round"/>
-  <line x1="${cx}" y1="${cy}" x2="${cx - arm * 0.35}" y2="${cy - arm}" stroke="#e0e0e0" stroke-width="${stroke}" stroke-linecap="round"/>
-  <line x1="${cx}" y1="${cy}" x2="${cx - arm * 0.35}" y2="${cy + arm}" stroke="#e0e0e0" stroke-width="${stroke}" stroke-linecap="round"/>
-  <!-- rotors -->
-  <ellipse cx="${cx + arm}" cy="${cy - arm}" rx="${rotorR}" ry="${rotorR * 0.18}" fill="#4aff80" opacity="0.85"/>
-  <ellipse cx="${cx + arm}" cy="${cy + arm}" rx="${rotorR}" ry="${rotorR * 0.18}" fill="#4aff80" opacity="0.85"/>
-  <ellipse cx="${cx - arm * 0.35}" cy="${cy - arm}" rx="${rotorR * 0.75}" ry="${rotorR * 0.18}" fill="#4aff80" opacity="0.85"/>
-  <ellipse cx="${cx - arm * 0.35}" cy="${cy + arm}" rx="${rotorR * 0.75}" ry="${rotorR * 0.18}" fill="#4aff80" opacity="0.85"/>
-  <!-- body -->
-  <circle cx="${cx}" cy="${cy}" r="${bodyR}" fill="#4a9eff"/>
-  <circle cx="${cx}" cy="${cy}" r="${bodyR * 0.55}" fill="#0d0d1a"/>
-</svg>`;
-}
-
 mkdirSync(`${root}/public/icons`, { recursive: true });
 
-for (const size of [192, 512]) {
-  const svg = Buffer.from(makeSvg(size));
-  await sharp(svg)
+async function writePng(svg, outputPath, width, height = width) {
+  await sharp(Buffer.from(svg))
+    .resize(width, height, {
+      fit: 'contain',
+      background: BACKGROUND_COLOR,
+    })
     .png()
-    .toFile(`${root}/public/icons/icon-${size}.png`);
-  console.log(`Generated icon-${size}.png`);
+    .toFile(outputPath);
+  console.log(`Generated ${outputPath.replace(`${root}/`, '')}`);
 }
 
-// Also write a simple SVG favicon (reuse same design at 64px)
-const faviconSvg = makeSvg(64).replace('width="64" height="64"', 'width="64" height="64" viewBox="0 0 64 64"');
+const svg1024 = buildIconSvg(1024);
 
-writeFileSync(`${root}/public/favicon.svg`, faviconSvg);
-console.log('Generated favicon.svg');
+const webTargets = [
+  { path: `${root}/public/icons/favicon-64.png`, width: 64 },
+  { path: `${root}/public/icons/icon-192.png`, width: 192 },
+  { path: `${root}/public/icons/icon-512.png`, width: 512 },
+];
+
+for (const target of webTargets) {
+  await writePng(svg1024, target.path, target.width);
+}
+
+writeFileSync(`${root}/public/favicon.svg`, buildIconSvg(64));
+console.log('Generated public/favicon.svg');
+
+const launcherSizes = [
+  { dir: 'mipmap-mdpi', launcher: 48, foreground: 108 },
+  { dir: 'mipmap-hdpi', launcher: 72, foreground: 162 },
+  { dir: 'mipmap-xhdpi', launcher: 96, foreground: 216 },
+  { dir: 'mipmap-xxhdpi', launcher: 144, foreground: 324 },
+  { dir: 'mipmap-xxxhdpi', launcher: 192, foreground: 432 },
+];
+
+for (const size of launcherSizes) {
+  const base = `${root}/android/app/src/main/res/${size.dir}`;
+  await writePng(svg1024, `${base}/ic_launcher.png`, size.launcher);
+  await writePng(svg1024, `${base}/ic_launcher_round.png`, size.launcher);
+  await writePng(svg1024, `${base}/ic_launcher_foreground.png`, size.foreground);
+}
+
+const splashTargets = [
+  { path: `${root}/android/app/src/main/res/drawable/splash.png`, width: 480, height: 320 },
+  { path: `${root}/android/app/src/main/res/drawable-port-mdpi/splash.png`, width: 320, height: 480 },
+  { path: `${root}/android/app/src/main/res/drawable-port-hdpi/splash.png`, width: 480, height: 800 },
+  { path: `${root}/android/app/src/main/res/drawable-port-xhdpi/splash.png`, width: 720, height: 1280 },
+  { path: `${root}/android/app/src/main/res/drawable-port-xxhdpi/splash.png`, width: 960, height: 1600 },
+  { path: `${root}/android/app/src/main/res/drawable-port-xxxhdpi/splash.png`, width: 1280, height: 1920 },
+  { path: `${root}/android/app/src/main/res/drawable-land-mdpi/splash.png`, width: 480, height: 320 },
+  { path: `${root}/android/app/src/main/res/drawable-land-hdpi/splash.png`, width: 800, height: 480 },
+  { path: `${root}/android/app/src/main/res/drawable-land-xhdpi/splash.png`, width: 1280, height: 720 },
+  { path: `${root}/android/app/src/main/res/drawable-land-xxhdpi/splash.png`, width: 1600, height: 960 },
+  { path: `${root}/android/app/src/main/res/drawable-land-xxxhdpi/splash.png`, width: 1920, height: 1280 },
+];
+
+for (const target of splashTargets) {
+  await writePng(svg1024, target.path, target.width, target.height);
+}
