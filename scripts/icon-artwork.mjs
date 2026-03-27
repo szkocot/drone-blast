@@ -1,4 +1,5 @@
 export const BACKGROUND_COLOR = '#2c2828';
+export const WEB_ICON_BASENAME = 'v072';
 
 const BLUE = '#1187de';
 const ORANGE = '#ff890f';

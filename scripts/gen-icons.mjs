@@ -6,7 +6,7 @@ import sharp from 'sharp';
 import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { BACKGROUND_COLOR, buildIconSvg } from './icon-artwork.mjs';
+import { BACKGROUND_COLOR, buildIconSvg, WEB_ICON_BASENAME } from './icon-artwork.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
@@ -27,9 +27,9 @@ async function writePng(svg, outputPath, width, height = width) {
 const svg1024 = buildIconSvg(1024);
 
 const webTargets = [
-  { path: `${root}/public/icons/favicon-64.png`, width: 64 },
-  { path: `${root}/public/icons/icon-192.png`, width: 192 },
-  { path: `${root}/public/icons/icon-512.png`, width: 512 },
+  { path: `${root}/public/icons/favicon-64-${WEB_ICON_BASENAME}.png`, width: 64 },
+  { path: `${root}/public/icons/icon-192-${WEB_ICON_BASENAME}.png`, width: 192 },
+  { path: `${root}/public/icons/icon-512-${WEB_ICON_BASENAME}.png`, width: 512 },
 ];
 
 for (const target of webTargets) {
