@@ -6,7 +6,7 @@ import sharp from 'sharp';
 import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { BACKGROUND_COLOR, buildIconSvg, WEB_ICON_BASENAME } from './icon-artwork.mjs';
+import { BACKGROUND_COLOR, getFaviconSvg, getMainIconSvg, WEB_ICON_BASENAME } from './icon-artwork.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
@@ -24,19 +24,20 @@ async function writePng(svg, outputPath, width, height = width) {
   console.log(`Generated ${outputPath.replace(`${root}/`, '')}`);
 }
 
-const svg1024 = buildIconSvg(1024);
+const faviconSvg = getFaviconSvg();
+const mainIconSvg = getMainIconSvg();
 
 const webTargets = [
-  { path: `${root}/public/icons/favicon-64-${WEB_ICON_BASENAME}.png`, width: 64 },
-  { path: `${root}/public/icons/icon-192-${WEB_ICON_BASENAME}.png`, width: 192 },
-  { path: `${root}/public/icons/icon-512-${WEB_ICON_BASENAME}.png`, width: 512 },
+  { svg: faviconSvg, path: `${root}/public/icons/favicon-64-${WEB_ICON_BASENAME}.png`, width: 64 },
+  { svg: mainIconSvg, path: `${root}/public/icons/icon-192-${WEB_ICON_BASENAME}.png`, width: 192 },
+  { svg: mainIconSvg, path: `${root}/public/icons/icon-512-${WEB_ICON_BASENAME}.png`, width: 512 },
 ];
 
 for (const target of webTargets) {
-  await writePng(svg1024, target.path, target.width);
+  await writePng(target.svg, target.path, target.width);
 }
 
-writeFileSync(`${root}/public/favicon.svg`, buildIconSvg(64));
+writeFileSync(`${root}/public/favicon.svg`, faviconSvg);
 console.log('Generated public/favicon.svg');
 
 const launcherSizes = [
@@ -49,9 +50,9 @@ const launcherSizes = [
 
 for (const size of launcherSizes) {
   const base = `${root}/android/app/src/main/res/${size.dir}`;
-  await writePng(svg1024, `${base}/ic_launcher.png`, size.launcher);
-  await writePng(svg1024, `${base}/ic_launcher_round.png`, size.launcher);
-  await writePng(svg1024, `${base}/ic_launcher_foreground.png`, size.foreground);
+  await writePng(mainIconSvg, `${base}/ic_launcher.png`, size.launcher);
+  await writePng(mainIconSvg, `${base}/ic_launcher_round.png`, size.launcher);
+  await writePng(mainIconSvg, `${base}/ic_launcher_foreground.png`, size.foreground);
 }
 
 const splashTargets = [
@@ -69,5 +70,5 @@ const splashTargets = [
 ];
 
 for (const target of splashTargets) {
-  await writePng(svg1024, target.path, target.width, target.height);
+  await writePng(mainIconSvg, target.path, target.width, target.height);
 }

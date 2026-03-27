@@ -1,69 +1,19 @@
-export const BACKGROUND_COLOR = '#2c2828';
-export const WEB_ICON_BASENAME = 'v072';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const BLUE = '#1187de';
-const ORANGE = '#ff890f';
-const WHITE = '#f6f6f6';
-const BLACK = '#252222';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export function buildIconSvg(size = 1024) {
-  const s = size;
-  /** @param {number} value */
-  const r = (value) => Number((value * s).toFixed(2));
+export const BACKGROUND_COLOR = '#2b2a29';
+export const WEB_ICON_BASENAME = 'v073';
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
-  <rect width="${s}" height="${s}" fill="${BACKGROUND_COLOR}"/>
+const FAVICON_SOURCE_PATH = resolve(__dirname, 'icon-sources/favicon-source.svg');
+const MAIN_ICON_SOURCE_PATH = resolve(__dirname, 'icon-sources/main-icon-source.svg');
 
-  <g transform="translate(${r(0.07)} ${r(0.05)}) scale(0.82)">
-    <path fill="${BLUE}" d="M ${r(0.03)} ${r(0.17)} C ${r(0.12)} ${r(0.14)}, ${r(0.23)} ${r(0.15)}, ${r(0.39)} ${r(0.20)} C ${r(0.47)} ${r(0.22)}, ${r(0.52)} ${r(0.25)}, ${r(0.56)} ${r(0.28)} C ${r(0.52)} ${r(0.31)}, ${r(0.46)} ${r(0.33)}, ${r(0.39)} ${r(0.34)} C ${r(0.30)} ${r(0.35)}, ${r(0.19)} ${r(0.33)}, ${r(0.09)} ${r(0.28)} C ${r(0.05)} ${r(0.25)}, ${r(0.03)} ${r(0.21)}, ${r(0.03)} ${r(0.17)} Z"/>
-    <path fill="${BLUE}" d="M ${r(0.00)} ${r(0.27)} C ${r(0.09)} ${r(0.26)}, ${r(0.17)} ${r(0.30)}, ${r(0.28)} ${r(0.36)} C ${r(0.41)} ${r(0.43)}, ${r(0.55)} ${r(0.47)}, ${r(0.66)} ${r(0.52)} C ${r(0.70)} ${r(0.55)}, ${r(0.73)} ${r(0.60)}, ${r(0.72)} ${r(0.66)} C ${r(0.71)} ${r(0.74)}, ${r(0.65)} ${r(0.84)}, ${r(0.55)} ${r(0.88)} C ${r(0.49)} ${r(0.91)}, ${r(0.43)} ${r(0.89)}, ${r(0.39)} ${r(0.84)} C ${r(0.34)} ${r(0.78)}, ${r(0.31)} ${r(0.71)}, ${r(0.28)} ${r(0.61)} C ${r(0.25)} ${r(0.50)}, ${r(0.20)} ${r(0.42)}, ${r(0.13)} ${r(0.37)} C ${r(0.08)} ${r(0.33)}, ${r(0.04)} ${r(0.31)}, ${r(0.00)} ${r(0.27)} Z"/>
-    <path fill="${BLUE}" d="M ${r(0.56)} ${r(0.15)} C ${r(0.64)} ${r(0.07)}, ${r(0.76)} ${r(0.05)}, ${r(0.85)} ${r(0.11)} C ${r(0.92)} ${r(0.17)}, ${r(0.96)} ${r(0.25)}, ${r(0.98)} ${r(0.33)} L ${r(0.88)} ${r(0.33)} C ${r(0.86)} ${r(0.26)}, ${r(0.83)} ${r(0.21)}, ${r(0.78)} ${r(0.18)} C ${r(0.72)} ${r(0.15)}, ${r(0.64)} ${r(0.14)}, ${r(0.56)} ${r(0.15)} Z"/>
-    <path fill="${BLUE}" d="M ${r(0.41)} ${r(0.15)} C ${r(0.48)} ${r(0.09)}, ${r(0.57)} ${r(0.07)}, ${r(0.63)} ${r(0.11)} C ${r(0.68)} ${r(0.14)}, ${r(0.71)} ${r(0.20)}, ${r(0.71)} ${r(0.27)} C ${r(0.64)} ${r(0.23)}, ${r(0.57)} ${r(0.22)}, ${r(0.50)} ${r(0.22)} C ${r(0.46)} ${r(0.20)}, ${r(0.43)} ${r(0.18)}, ${r(0.41)} ${r(0.15)} Z"/>
-    <path fill="${ORANGE}" d="M ${r(0.63)} ${r(0.55)} C ${r(0.70)} ${r(0.58)}, ${r(0.81)} ${r(0.58)}, ${r(0.94)} ${r(0.56)} L ${r(1.05)} ${r(0.70)} L ${r(0.90)} ${r(0.83)} C ${r(0.83)} ${r(0.83)}, ${r(0.75)} ${r(0.81)}, ${r(0.68)} ${r(0.77)} C ${r(0.62)} ${r(0.74)}, ${r(0.57)} ${r(0.69)}, ${r(0.54)} ${r(0.62)} C ${r(0.57)} ${r(0.58)}, ${r(0.60)} ${r(0.56)}, ${r(0.63)} ${r(0.55)} Z"/>
+export function getFaviconSvg() {
+  return readFileSync(FAVICON_SOURCE_PATH, 'utf8');
+}
 
-    <g fill="${BLACK}">
-      <path d="M ${r(0.10)} ${r(0.22)} C ${r(0.17)} ${r(0.19)}, ${r(0.28)} ${r(0.19)}, ${r(0.39)} ${r(0.21)} C ${r(0.47)} ${r(0.23)}, ${r(0.56)} ${r(0.25)}, ${r(0.66)} ${r(0.25)} C ${r(0.75)} ${r(0.25)}, ${r(0.84)} ${r(0.23)}, ${r(0.92)} ${r(0.25)} C ${r(0.98)} ${r(0.27)}, ${r(1.03)} ${r(0.29)}, ${r(1.07)} ${r(0.32)} C ${r(1.02)} ${r(0.35)}, ${r(0.96)} ${r(0.36)}, ${r(0.89)} ${r(0.36)} C ${r(0.82)} ${r(0.36)}, ${r(0.74)} ${r(0.36)}, ${r(0.66)} ${r(0.34)} C ${r(0.61)} ${r(0.33)}, ${r(0.57)} ${r(0.31)}, ${r(0.55)} ${r(0.27)} C ${r(0.53)} ${r(0.31)}, ${r(0.51)} ${r(0.33)}, ${r(0.45)} ${r(0.34)} C ${r(0.36)} ${r(0.36)}, ${r(0.28)} ${r(0.36)}, ${r(0.21)} ${r(0.36)} C ${r(0.15)} ${r(0.35)}, ${r(0.10)} ${r(0.34)}, ${r(0.06)} ${r(0.32)} C ${r(0.06)} ${r(0.28)}, ${r(0.08)} ${r(0.24)}, ${r(0.10)} ${r(0.22)} Z"/>
-      <circle cx="${r(0.23)}" cy="${r(0.24)}" r="${r(0.03)}"/>
-      <circle cx="${r(0.82)}" cy="${r(0.24)}" r="${r(0.03)}"/>
-      <rect x="${r(0.20)}" y="${r(0.24)}" width="${r(0.06)}" height="${r(0.16)}" rx="${r(0.03)}"/>
-      <rect x="${r(0.79)}" y="${r(0.24)}" width="${r(0.06)}" height="${r(0.16)}" rx="${r(0.03)}"/>
-      <rect x="${r(0.26)}" y="${r(0.28)}" width="${r(0.18)}" height="${r(0.10)}" rx="${r(0.04)}"/>
-      <rect x="${r(0.62)}" y="${r(0.28)}" width="${r(0.18)}" height="${r(0.10)}" rx="${r(0.04)}"/>
-      <rect x="${r(0.42)}" y="${r(0.18)}" width="${r(0.14)}" height="${r(0.18)}" rx="${r(0.07)}"/>
-    </g>
-
-    <g fill="${WHITE}">
-      <ellipse cx="${r(0.12)}" cy="${r(0.28)}" rx="${r(0.11)}" ry="${r(0.04)}"/>
-      <ellipse cx="${r(0.34)}" cy="${r(0.28)}" rx="${r(0.11)}" ry="${r(0.04)}"/>
-      <ellipse cx="${r(0.72)}" cy="${r(0.28)}" rx="${r(0.11)}" ry="${r(0.04)}"/>
-      <ellipse cx="${r(0.94)}" cy="${r(0.28)}" rx="${r(0.11)}" ry="${r(0.04)}"/>
-      <circle cx="${r(0.23)}" cy="${r(0.24)}" r="${r(0.02)}"/>
-      <circle cx="${r(0.82)}" cy="${r(0.24)}" r="${r(0.02)}"/>
-      <rect x="${r(0.19)}" y="${r(0.26)}" width="${r(0.10)}" height="${r(0.18)}" rx="${r(0.05)}"/>
-      <rect x="${r(0.77)}" y="${r(0.26)}" width="${r(0.10)}" height="${r(0.18)}" rx="${r(0.05)}"/>
-      <rect x="${r(0.26)}" y="${r(0.31)}" width="${r(0.22)}" height="${r(0.11)}" rx="${r(0.05)}"/>
-      <rect x="${r(0.58)}" y="${r(0.31)}" width="${r(0.22)}" height="${r(0.11)}" rx="${r(0.05)}"/>
-      <rect x="${r(0.44)}" y="${r(0.27)}" width="${r(0.16)}" height="${r(0.21)}" rx="${r(0.06)}"/>
-    </g>
-  </g>
-
-  <g transform="translate(${r(0.50)} ${r(0.70)}) skewX(-10)">
-    <text
-      x="0"
-      y="0"
-      text-anchor="middle"
-      font-family="Arial Black, Impact, sans-serif"
-      font-size="${r(0.18)}"
-      font-weight="900"
-      fill="${WHITE}">DRONE</text>
-    <text
-      x="0"
-      y="${r(0.16)}"
-      text-anchor="middle"
-      font-family="Arial Black, Impact, sans-serif"
-      font-size="${r(0.18)}"
-      font-weight="900"
-      fill="${ORANGE}">BLAST</text>
-  </g>
-</svg>`;
+export function getMainIconSvg() {
+  return readFileSync(MAIN_ICON_SOURCE_PATH, 'utf8');
 }

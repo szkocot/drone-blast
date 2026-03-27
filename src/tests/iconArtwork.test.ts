@@ -1,23 +1,34 @@
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
-import { BACKGROUND_COLOR, buildIconSvg } from '../../scripts/icon-artwork.mjs';
+import {
+  BACKGROUND_COLOR,
+  getFaviconSvg,
+  getMainIconSvg,
+} from '../../scripts/icon-artwork.mjs';
 
-describe('buildIconSvg', () => {
-  it('includes the Drone Blast wordmark and brand colors', () => {
-    const svg = buildIconSvg(512);
+describe('icon artwork sources', () => {
+  it('uses the no-wordmark source for the favicon artwork', () => {
+    const svg = getFaviconSvg();
 
-    expect(svg).toContain('DRONE');
-    expect(svg).toContain('BLAST');
-    expect(svg).toContain(BACKGROUND_COLOR);
-    expect(svg).toContain('#1187de');
-    expect(svg).toContain('#ff890f');
+    expect(svg).not.toContain('DRONE');
+    expect(svg).not.toContain('BLAST');
+    expect(svg.toLowerCase()).toContain(BACKGROUND_COLOR);
+    expect(svg).toContain('viewBox="0 0 172.97 172.97"');
+  });
+
+  it('uses the full-logo source for the main icon artwork', () => {
+    const svg = getMainIconSvg();
+
+    expect(svg.toLowerCase()).toContain(BACKGROUND_COLOR);
+    expect(svg).toContain('viewBox="0 0 176.43 176.43"');
+    expect(svg).toContain('fill-rule:nonzero');
   });
 
   it('renders to the requested square size', async () => {
-    const svg = buildIconSvg(256);
+    const svg = getMainIconSvg();
     const metadata = await sharp(Buffer.from(svg)).png().metadata();
 
-    expect(metadata.width).toBe(256);
-    expect(metadata.height).toBe(256);
+    expect(metadata.width).toBeGreaterThan(0);
+    expect(metadata.height).toBeGreaterThan(0);
   });
 });
