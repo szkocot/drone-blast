@@ -32,20 +32,32 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): num
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-export function read(lat: number, lon: number): { windGrid: WindGrid; modelCount: number } | null {
+function deserializeEntry(entry: StoredEntry): { windGrid: WindGrid; modelCount: number } {
+  return {
+    windGrid: { ...entry.windGrid, times: entry.windGrid.times.map(s => new Date(s)) },
+    modelCount: entry.modelCount,
+  };
+}
+
+function readEntry(lat: number, lon: number, allowStale: boolean): { windGrid: WindGrid; modelCount: number } | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     const entry: StoredEntry = JSON.parse(raw);
-    if (Date.now() - entry.timestamp >= TTL_MS) return null;
+    if (!allowStale && Date.now() - entry.timestamp >= TTL_MS) return null;
     if (distanceKm(entry.lat, entry.lon, lat, lon) >= PROXIMITY_KM) return null;
-    return {
-      windGrid: { ...entry.windGrid, times: entry.windGrid.times.map(s => new Date(s)) },
-      modelCount: entry.modelCount,
-    };
+    return deserializeEntry(entry);
   } catch {
     return null;
   }
+}
+
+export function read(lat: number, lon: number): { windGrid: WindGrid; modelCount: number } | null {
+  return readEntry(lat, lon, false);
+}
+
+export function readStale(lat: number, lon: number): { windGrid: WindGrid; modelCount: number } | null {
+  return readEntry(lat, lon, true);
 }
 
 export function write(lat: number, lon: number, windGrid: WindGrid, modelCount: number): void {

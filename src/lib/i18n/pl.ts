@@ -8,6 +8,7 @@ export const pl: Translations = {
   couldNotLoad: 'Nie udało się załadować prognozy — sprawdź połączenie.',
   forecastRateLimit: 'Nie udało się pobrać prognozy — przekroczono limit API pogodowego. Spróbuj ponownie za minutę.',
   forecastConnection: 'Nie udało się pobrać prognozy — sprawdź połączenie.',
+  forecastUnavailable: 'Nie udało się pobrać prognozy — serwis pogodowy jest chwilowo niedostępny.',
   limitedData: (n: number) => `Ograniczone dane — dostępne ${n} z 6 źródeł`,
   locationRequired: 'Dostęp do lokalizacji jest wymagany, aby pobrać lokalną prognozę wiatru.',
   locationHelp: 'Włącz lokalizację w ustawieniach przeglądarki i odśwież stronę.',

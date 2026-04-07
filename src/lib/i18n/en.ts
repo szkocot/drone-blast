@@ -7,6 +7,7 @@ export const en = {
   couldNotLoad: 'Could not load forecast — check your connection.',
   forecastRateLimit: 'Could not load forecast — weather API limit exceeded. Try again in a minute.',
   forecastConnection: 'Could not load forecast — check your connection.',
+  forecastUnavailable: 'Could not load forecast — weather service temporarily unavailable.',
   limitedData: (n: number) => `Limited data — ${n} of 6 sources available`,
   locationRequired: 'Location access is required to fetch local wind forecasts.',
   locationHelp: 'Please enable location in your browser settings and reload.',

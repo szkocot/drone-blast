@@ -2,9 +2,9 @@
 import { writable, get } from 'svelte/store';
 import type { WindGrid, FetchState } from '../types';
 import { MODELS } from '../types';
-import { fetchModel, WeatherApiRateLimitError } from '../services/openMeteo';
+import { fetchModel, WeatherApiRateLimitError, WeatherApiUnavailableError } from '../services/openMeteo';
 import { buildGrid } from '../services/windProcessor';
-import { read as cacheRead, write as cacheWrite } from '../services/forecastCache';
+import { read as cacheRead, readStale as cacheReadStale, write as cacheWrite } from '../services/forecastCache';
 import { currentTranslations } from '../i18n';
 
 export const windGrid     = writable<WindGrid | null>(null);
@@ -27,9 +27,12 @@ function forecastFailureMessage(results: PromiseSettledResult<Awaited<ReturnType
   const sawRateLimit = results.some(
     (result) => result.status === 'rejected' && result.reason instanceof WeatherApiRateLimitError,
   );
-  return sawRateLimit
-    ? currentTranslations().forecastRateLimit
-    : currentTranslations().forecastConnection;
+  const sawUnavailable = results.some(
+    (result) => result.status === 'rejected' && result.reason instanceof WeatherApiUnavailableError,
+  );
+  if (sawRateLimit) return currentTranslations().forecastRateLimit;
+  if (sawUnavailable) return currentTranslations().forecastUnavailable;
+  return currentTranslations().forecastConnection;
 }
 
 async function doNetworkFetch(lat: number, lon: number): Promise<void> {
@@ -85,6 +88,13 @@ export async function fetchWind(lat: number, lon: number): Promise<void> {
     .map(r => r.value);
 
   if (succeeded.length < 2) {
+    const stale = cacheReadStale(lat, lon);
+    if (stale) {
+      windGrid.set(stale.windGrid);
+      fetchState.set({ type: 'loaded', modelCount: stale.modelCount, fromCache: true });
+      return;
+    }
+
     fetchState.set({ type: 'failed', message: forecastFailureMessage(results) });
     return;
   }

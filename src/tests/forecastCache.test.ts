@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { read, readOverlaySample, write, writeOverlaySample } from '../lib/services/forecastCache';
+import { read, readOverlaySample, readStale, write, writeOverlaySample } from '../lib/services/forecastCache';
 import type { OverlaySample, WindGrid } from '../lib/types';
 
 function makeGrid(overrides: Partial<WindGrid> = {}): WindGrid {
@@ -78,6 +78,20 @@ describe('read', () => {
   it('returns null when localStorage.getItem throws', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('unavailable'); });
     expect(read(50, 20)).toBeNull();
+  });
+
+  it('returns stale cached data when explicitly requested and within 5km', () => {
+    vi.useFakeTimers();
+    const now = Date.now();
+    vi.setSystemTime(now);
+    write(50, 20, makeGrid(), 4);
+
+    vi.setSystemTime(now + 60 * 60 * 1000 + 1);
+
+    const result = readStale(50, 20);
+    expect(result).not.toBeNull();
+    expect(result!.modelCount).toBe(4);
+    expect(result!.windGrid.times[0]).toBeInstanceOf(Date);
   });
 });
 

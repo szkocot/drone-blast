@@ -7,6 +7,7 @@ import {
   fetchModel,
   interpolateOverlay20m,
   WeatherApiRateLimitError,
+  WeatherApiUnavailableError,
 } from '../lib/services/openMeteo';
 
 describe('buildUrl', () => {
@@ -161,5 +162,14 @@ describe('fetchModel timeout', () => {
     }));
 
     await expect(fetchModel(0, 0, 'best_match')).rejects.toBeInstanceOf(WeatherApiRateLimitError);
+  });
+
+  it('throws an unavailable error when the API returns 502', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 502,
+    }));
+
+    await expect(fetchModel(0, 0, 'best_match')).rejects.toBeInstanceOf(WeatherApiUnavailableError);
   });
 });

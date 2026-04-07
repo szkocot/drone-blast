@@ -8,6 +8,13 @@ export class WeatherApiRateLimitError extends Error {
   }
 }
 
+export class WeatherApiUnavailableError extends Error {
+  constructor(message = 'Weather API is temporarily unavailable.') {
+    super(message);
+    this.name = 'WeatherApiUnavailableError';
+  }
+}
+
 interface DecodedModel extends ModelData {
   times: Date[];
 }
@@ -112,6 +119,7 @@ export async function fetchModel(lat: number, lon: number, model: string): Promi
       hard,
     ]);
     if (res.status === 429) throw new WeatherApiRateLimitError();
+    if (res.status >= 500) throw new WeatherApiUnavailableError(`HTTP ${res.status}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return decodeResponse(await res.json());
   } finally {
