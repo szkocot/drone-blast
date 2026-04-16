@@ -9,6 +9,7 @@
   import { kpStore, fetchKp } from './lib/stores/kpStore';
   import { createMapOverlayController } from './lib/stores/mapOverlayStore';
   import { densityForZoom } from './lib/services/mapOverlay';
+  import { decideAutoLocationFailure } from './lib/startupLocation';
   import { currentHourIndex } from './lib/windGrid';
 
   import AppHeader       from './lib/components/AppHeader.svelte';
@@ -38,6 +39,7 @@
   let viewportBounds: { west: number; south: number; east: number; north: number } | null = null;
   let viewportZoom = 0;
   let lastGridSignature = '';
+  let latestMarkerRequest = 0;
 
   const mapOverlay = createMapOverlayController();
 
@@ -49,7 +51,7 @@
     const key = $settingsStore.locationMode + '|' + JSON.stringify($settingsStore.customLocation);
     if (_lastFetchedKey && key !== _lastFetchedKey) {
       _lastFetchedKey = key;
-      requestLocation();
+      requestLocation(true);
     }
   }
 
@@ -83,7 +85,7 @@
     else document.documentElement.setAttribute('data-theme', ap);
   }
 
-  function onLocation(pos: GeolocationPosition) {
+  function onLocation(pos: GeolocationPosition, forceForecastFetch = false) {
     const { latitude: lat, longitude: lon } = pos.coords;
     const radius = $settingsStore.refetchRadiusKm;
     if (
@@ -95,19 +97,19 @@
     }
     lastFetchLat = lat;
     lastFetchLon = lon;
-    fetchWind(lat, lon);
+    fetchWind(lat, lon, { force: forceForecastFetch });
     reverseGeocode(lat, lon).then(name => {
       lastKnownLocationName = name;
       locationName.set(name);
     });
   }
 
-  function fetchCustomLocation(lat: number, lon: number, name: string) {
+  function fetchCustomLocation(lat: number, lon: number, name: string, forceForecastFetch = false) {
     // Custom/fallback fetches must invalidate the GPS radius cache so
     // switching back to Auto or recovering GPS triggers a fresh load.
     lastFetchLat = null;
     lastFetchLon = null;
-    fetchWind(lat, lon);
+    fetchWind(lat, lon, { force: forceForecastFetch });
     lastKnownLocationName = name;
     locationName.set(name);
   }
@@ -129,11 +131,11 @@
     return { lat: 50.2965, lon: 18.9546, name: 'Chorzów, Poland' };
   }
 
-  function openWindMap() {
+  function openWindMap(preferredMode: 'auto' | 'custom' | null = null) {
     const current = currentLocation();
     const currentIndex = $windGrid ? currentHourIndex($windGrid) : 0;
     mapOverlay.openAtLocation(current);
-    mapOverlay.setMode($settingsStore.locationMode);
+    mapOverlay.setMode(preferredMode ?? $settingsStore.locationMode);
     if ($windGrid && ($hourOffset < 0 || $hourOffset >= $windGrid.times.length || $hourOffset === 0)) {
       hourOffset.set(currentIndex);
     }
@@ -168,11 +170,24 @@
     }, 250);
   }
 
+  function onWindMapMarkerSelect(location: { lat: number; lon: number; name?: string }) {
+    const fallbackName = location.name ?? $t.selectedSpot;
+    mapOverlay.setCustomLocation({ lat: location.lat, lon: location.lon, name: fallbackName });
+    const requestId = ++latestMarkerRequest;
+    reverseGeocode(location.lat, location.lon).then((name) => {
+      if (requestId !== latestMarkerRequest) return;
+      mapOverlay.setCustomLocation({ lat: location.lat, lon: location.lon, name });
+    });
+  }
+
   function onWindMapSearchSelect(result: GeoResult) {
     searchQuery = result.name;
     searchResults = [];
     searchAttempted = false;
     mapOverlay.setMapCenter(result);
+    if ($mapOverlay.mode === 'custom') {
+      onWindMapMarkerSelect(result);
+    }
     windMapInstance?.flyTo({ center: [result.lon, result.lat], zoom: Math.max(windMapInstance.getZoom(), 9) });
   }
 
@@ -212,7 +227,7 @@
     closeWindMap();
   }
 
-  function requestLocation() {
+  function requestLocation(forceForecastFetch = false) {
 
     const mode = $settingsStore.locationMode;
     _lastFetchedKey = mode + '|' + JSON.stringify($settingsStore.customLocation);
@@ -220,7 +235,7 @@
 
     if (mode === 'custom') {
       if (custom) {
-        fetchCustomLocation(custom.lat, custom.lon, custom.name);
+        fetchCustomLocation(custom.lat, custom.lon, custom.name, forceForecastFetch);
       } else {
         settingsStore.update((s) => ({ ...s, locationMode: 'auto' }));
       }
@@ -229,12 +244,14 @@
 
     // Auto mode
 
-    navigator.geolocation.getCurrentPosition(onLocation, () => {
-      if (custom) {
-        fetchCustomLocation(custom.lat, custom.lon, custom.name);
-      } else {
-        fetchCustomLocation(50.2965, 18.9546, 'Chorzów, Poland');
+    navigator.geolocation.getCurrentPosition((position) => onLocation(position, forceForecastFetch), () => {
+      const fallback = decideAutoLocationFailure(custom);
+      if (fallback.type === 'use-custom') {
+        fetchCustomLocation(fallback.location.lat, fallback.location.lon, fallback.location.name, forceForecastFetch);
+        return;
       }
+
+      openWindMap(fallback.mode);
     }, { timeout: 10000 });
   }
 
@@ -269,7 +286,7 @@
     <div class="full-screen-msg">
       <span class="icon">📡</span>
       <p>{$fetchState.message}</p>
-      <button on:click={requestLocation}>{$t.retry}</button>
+      <button on:click={() => requestLocation()}>{$t.retry}</button>
     </div>
   {:else if $fetchState.type === 'loaded' && $windGrid}
     <!-- Main UI -->
@@ -396,6 +413,10 @@
       onSearchChange={onWindMapSearchChange}
       onSearchSelect={onWindMapSearchSelect}
       onModeChange={(mode) => mapOverlay.setMode(mode)}
+      selectedMarker={$mapOverlay.mode === 'custom'
+        ? ($mapOverlay.pendingCustomLocation ?? $mapOverlay.selectedCustomLocation)
+        : null}
+      onMapSelect={onWindMapMarkerSelect}
       onHourSelect={(id) => {
         if (id === 'now') {
           const currentIndex = $windGrid ? currentHourIndex($windGrid) : 0;

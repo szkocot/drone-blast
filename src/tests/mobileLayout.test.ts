@@ -68,6 +68,12 @@ describe('mobile layout regressions', () => {
     expect(css).toMatch(/padding:\s*12px\s+16px\s+calc\(12px \+ var\(--safe-bottom\)\)/);
   });
 
+  it('keeps the selected wind map marker above the overlay canvas', () => {
+    const css = compiledCss('/Users/szymonkocot/Projects/fpv-blast/src/lib/components/WindMap.svelte');
+
+    expect(css).toMatch(/\.selected-marker(?:\.[\w-]+)?\s*\{[^}]*z-index:\s*14/s);
+  });
+
   it('opens the wind map with the active location as initial center', () => {
     const source = readFileSync('/Users/szymonkocot/Projects/fpv-blast/src/App.svelte', 'utf8');
 

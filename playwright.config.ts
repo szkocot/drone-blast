@@ -7,6 +7,19 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
   },
   projects: [
-    { name: 'chromium', use: { browserName: 'chromium' } },
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        launchOptions: {
+          args: [
+            '--use-angle=swiftshader',
+            '--use-gl=angle',
+            '--ignore-gpu-blocklist',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
+      },
+    },
   ],
 });

@@ -17,6 +17,7 @@ export interface MapOverlayState {
   mode: MapOverlayMode;
   activeLocation: MapOverlayLocation;
   mapCenter: OverlayPoint & { name?: string };
+  selectedCustomLocation: MapOverlayLocation | null;
   pendingCustomLocation: MapOverlayLocation | null;
   selectedHour: number;
   overlayState:
@@ -43,6 +44,7 @@ function defaultState(overrides: Partial<MapOverlayState> = {}): MapOverlayState
     mode: overrides.mode ?? 'auto',
     activeLocation,
     mapCenter,
+    selectedCustomLocation: overrides.selectedCustomLocation ?? null,
     pendingCustomLocation: overrides.pendingCustomLocation ?? null,
     selectedHour: overrides.selectedHour ?? 0,
     overlayState: overrides.overlayState ?? { type: 'idle' },
@@ -75,6 +77,7 @@ export function createMapOverlayController(deps: MapOverlayControllerDeps = {}) 
         ...state,
         activeLocation: next,
         mapCenter: next,
+        selectedCustomLocation: null,
         pendingCustomLocation: null,
       }));
     },
@@ -83,8 +86,11 @@ export function createMapOverlayController(deps: MapOverlayControllerDeps = {}) 
       store.update(state => ({
         ...state,
         mode,
+        selectedCustomLocation: mode === 'custom'
+          ? state.selectedCustomLocation ?? normalizeLocation(state.mapCenter, state.activeLocation.name)
+          : null,
         pendingCustomLocation: mode === 'custom'
-          ? state.pendingCustomLocation ?? normalizeLocation(state.mapCenter, state.activeLocation.name)
+          ? state.pendingCustomLocation ?? state.selectedCustomLocation ?? normalizeLocation(state.mapCenter, state.activeLocation.name)
           : null,
       }));
     },
@@ -93,10 +99,18 @@ export function createMapOverlayController(deps: MapOverlayControllerDeps = {}) 
       store.update(state => ({
         ...state,
         mapCenter: { ...center },
-        pendingCustomLocation: state.mode === 'custom'
-          ? normalizeLocation(center, state.activeLocation.name)
-          : state.pendingCustomLocation,
       }));
+    },
+
+    setCustomLocation(location: OverlayPoint & { name?: string }): void {
+      store.update(state => {
+        const next = normalizeLocation(location, state.activeLocation.name);
+        return {
+          ...state,
+          selectedCustomLocation: next,
+          pendingCustomLocation: next,
+        };
+      });
     },
 
     setSelectedHour(selectedHour: number): void {
@@ -112,6 +126,7 @@ export function createMapOverlayController(deps: MapOverlayControllerDeps = {}) 
           mode: 'custom',
           activeLocation: pending,
           mapCenter: { lat: pending.lat, lon: pending.lon, name: pending.name },
+          selectedCustomLocation: pending,
           pendingCustomLocation: null,
         };
       });

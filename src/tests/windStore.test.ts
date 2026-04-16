@@ -69,6 +69,30 @@ afterEach(() => {
 });
 
 describe('fetchWind', () => {
+  it('bypasses the in-session dedup guard when forced', async () => {
+    const { fetchWind, fetchModel } = await loadWindStore({
+      fetchModelImpl: async () => ({
+        times: [new Date('2026-03-26T10:00:00Z')],
+        at10m: [12],
+        at80m: [18],
+        at120m: [20],
+        at180m: [22],
+        directionAt10m: [180],
+        directionAt80m: [190],
+        temperature: [15],
+        weatherCode: [1],
+        windGust: [20],
+      }),
+    });
+
+    await fetchWind(50, 20);
+    fetchModel.mockClear();
+
+    await fetchWind(50, 20, { force: true });
+
+    expect(fetchModel).toHaveBeenCalledTimes(6);
+  });
+
   it('falls back to stale cached data when the network fetch fails on startup', async () => {
     vi.useFakeTimers();
     const now = Date.now();

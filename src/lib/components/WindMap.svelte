@@ -25,6 +25,12 @@
     bounds: { west: number; south: number; east: number; north: number } | null;
   }
 
+  interface WindMapMarker {
+    lat: number;
+    lon: number;
+    name?: string;
+  }
+
   export let mode: WindMapMode = 'auto';
   export let locationLabel = '';
   export let searchValue = '';
@@ -42,11 +48,13 @@
   export let mapStyle = 'https://tiles.openfreemap.org/styles/liberty';
   export let initialCenter: [number, number] = [0, 20];
   export let initialZoom = 2;
+  export let selectedMarker: WindMapMarker | null = null;
   export let primaryActionLabel = '';
   export let secondaryActionLabel = '';
   export let onBack: () => void = () => {};
   export let onSearchChange: (value: string) => void = () => {};
   export let onSearchSelect: (result: GeoResult) => void = () => {};
+  export let onMapSelect: (location: WindMapMarker) => void = () => {};
   export let onModeChange: (nextMode: WindMapMode) => void = () => {};
   export let onHourSelect: (id: string) => void = () => {};
   export let onPrimaryAction: () => void = () => {};
@@ -58,6 +66,7 @@
   let map: maplibregl.Map | undefined;
   let mapError = false;
   let mapReady = false;
+  let selectedMarkerScreen: { x: number; y: number } | null = null;
 
   function emitViewport() {
     if (!map) return;
@@ -79,6 +88,16 @@
     });
   }
 
+  function updateSelectedMarkerScreen() {
+    if (!map || mode !== 'custom' || !selectedMarker) {
+      selectedMarkerScreen = null;
+      return;
+    }
+
+    const projected = map.project([selectedMarker.lon, selectedMarker.lat]);
+    selectedMarkerScreen = { x: projected.x, y: projected.y };
+  }
+
   onMount(() => {
     if (!mapContainer) return;
 
@@ -95,9 +114,18 @@
     map.on('load', () => {
       mapReady = true;
       onMapReady(map as maplibregl.Map);
+      updateSelectedMarkerScreen();
       emitViewport();
     });
-    map.on('moveend', emitViewport);
+    map.on('click', (event) => {
+      if (mode !== 'custom') return;
+      onMapSelect({ lat: event.lngLat.lat, lon: event.lngLat.lng });
+    });
+    map.on('move', updateSelectedMarkerScreen);
+    map.on('moveend', () => {
+      updateSelectedMarkerScreen();
+      emitViewport();
+    });
     map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 
     return () => {
@@ -109,6 +137,13 @@
   onDestroy(() => {
     map?.remove();
   });
+
+  $: {
+    map;
+    mode;
+    selectedMarker;
+    updateSelectedMarkerScreen();
+  }
 
   $: primaryLabel = primaryActionLabel || (mode === 'custom' ? $t.confirmCustomLocation : $t.useCurrentView);
   $: secondaryLabel = secondaryActionLabel || $t.cancel;
@@ -221,8 +256,14 @@
       thresholdKmh={overlayThresholdKmh}
       density={overlayDensity}
     />
-    {#if mode === 'custom'}
-      <div class="center-pin" aria-hidden="true">📍</div>
+    {#if mode === 'custom' && selectedMarkerScreen}
+      <div
+        class="selected-marker"
+        aria-hidden="true"
+        style={`left:${selectedMarkerScreen.x}px;top:${selectedMarkerScreen.y}px;`}
+      >
+        📍
+      </div>
     {/if}
   </main>
 
@@ -469,15 +510,13 @@
     inset: 0;
   }
 
-  .center-pin {
+  .selected-marker {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -100%);
+    z-index: 14;
     font-size: 32px;
+    transform: translate(-50%, -100%);
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
     pointer-events: none;
-    z-index: 2;
   }
 
   .overlay-controls {

@@ -56,13 +56,15 @@ async function doNetworkFetch(lat: number, lon: number): Promise<void> {
   fetchState.set({ type: 'loaded', modelCount: succeeded.length });
 }
 
-export async function fetchWind(lat: number, lon: number): Promise<void> {
+export async function fetchWind(lat: number, lon: number, options: { force?: boolean } = {}): Promise<void> {
+  const force = options.force ?? false;
+
   // In-session dedup guard: prevents duplicate in-flight fetches from GPS jitter
-  if (lastFetchLat !== null && lastFetchLon !== null) {
+  if (!force && lastFetchLat !== null && lastFetchLon !== null) {
     if (distanceKm(lastFetchLat, lastFetchLon, lat, lon) < 5 && get(windGrid) !== null) return;
   }
 
-  const cached = cacheRead(lat, lon);
+  const cached = force ? null : cacheRead(lat, lon);
 
   if (cached) {
     // Cache hit: render immediately, update dedup guard, refresh in background

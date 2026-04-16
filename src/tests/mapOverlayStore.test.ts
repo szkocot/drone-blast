@@ -36,7 +36,7 @@ describe('map overlay controller', () => {
     });
 
     controller.setMode('custom');
-    controller.setMapCenter({ lat: 50.5, lon: 20.5, name: 'Field' });
+    controller.setCustomLocation({ lat: 50.5, lon: 20.5, name: 'Field' });
 
     expect(controller.getState().activeLocation.name).toBe('GPS spot');
     expect(controller.getState().pendingCustomLocation).toEqual({ lat: 50.5, lon: 20.5, name: 'Field' });
@@ -47,6 +47,27 @@ describe('map overlay controller', () => {
     expect(state.activeLocation).toEqual({ lat: 50.5, lon: 20.5, name: 'Field' });
     expect(state.pendingCustomLocation).toBeNull();
     expect(state.mode).toBe('custom');
+  });
+
+  it('keeps the chosen custom marker when the viewport keeps moving', () => {
+    const controller = createMapOverlayController({
+      initialState: {
+        mode: 'auto',
+        activeLocation: { lat: 50, lon: 20, name: 'GPS spot' },
+        mapCenter: { lat: 50, lon: 20, name: 'GPS spot' },
+        pendingCustomLocation: null,
+        selectedHour: 0,
+        overlayState: { type: 'idle' },
+      },
+    });
+
+    controller.setMode('custom');
+    controller.setCustomLocation({ lat: 50.2, lon: 20.3, name: 'Launch field' });
+    controller.setMapCenter({ lat: 50.8, lon: 20.9, name: 'Viewport only' });
+
+    const state = controller.getState();
+    expect(state.mapCenter).toEqual({ lat: 50.8, lon: 20.9, name: 'Viewport only' });
+    expect(state.pendingCustomLocation).toEqual({ lat: 50.2, lon: 20.3, name: 'Launch field' });
   });
 });
 
