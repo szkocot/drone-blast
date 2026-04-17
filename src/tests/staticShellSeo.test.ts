@@ -29,6 +29,10 @@ describe('static SEO shell', () => {
 
   it('contains visually hidden bilingual crawlable content', () => {
     expect(indexHtml).toContain('class="seo-content"');
+    expect(indexHtml).toContain('position: absolute');
+    expect(indexHtml).toContain('overflow: hidden');
+    expect(indexHtml).toContain('clip-path: inset(50%)');
+    expect(indexHtml).toContain('white-space: nowrap');
     expect(indexHtml).toContain('FPV drone pilots');
     expect(indexHtml).toContain('prognoza wiatru FPV');
     expect(indexHtml).toContain('7-day wind forecast');
