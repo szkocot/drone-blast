@@ -1,7 +1,16 @@
 import { describe, it, expect } from 'vitest';
 
 // We test the pure conversion helpers, not the store itself (stores require DOM)
-import { convertFromKmh, convertToKmh, thresholdStep, windColor, haversineKm, convertTemp, defaults } from '../lib/stores/settingsStore';
+import {
+  convertFromKmh,
+  convertToKmh,
+  thresholdStep,
+  windColor,
+  haversineKm,
+  convertTemp,
+  defaults,
+  thresholdForDroneSize,
+} from '../lib/stores/settingsStore';
 
 describe('convertFromKmh', () => {
   it('kmh passthrough', () => expect(convertFromKmh(36, 'kmh')).toBeCloseTo(36));
@@ -76,5 +85,22 @@ describe('defaults', () => {
   });
   it('customLocation defaults to null', () => {
     expect(defaults().customLocation).toBeNull();
+  });
+  it('keeps the existing full-height analysis by default', () => {
+    expect(defaults().maxAltitudeM).toBe(180);
+  });
+  it('defaults to the freestyle drone profile threshold', () => {
+    expect(defaults().droneSize).toBe('freestyle');
+    expect(defaults().thresholdKmh).toBe(thresholdForDroneSize('freestyle'));
+  });
+});
+
+describe('thresholdForDroneSize', () => {
+  it('maps smaller drones to lower wind thresholds', () => {
+    expect(thresholdForDroneSize('whoop')).toBeLessThan(thresholdForDroneSize('freestyle'));
+  });
+
+  it('maps larger drones to higher wind thresholds', () => {
+    expect(thresholdForDroneSize('longRange')).toBeGreaterThan(thresholdForDroneSize('freestyle'));
   });
 });

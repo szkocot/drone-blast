@@ -1,6 +1,6 @@
 // src/lib/stores/settingsStore.ts
 import { writable } from 'svelte/store';
-import type { Settings, WindUnit, TempUnit, LocationMode, CustomLocation } from '../types';
+import type { Settings, WindUnit, TempUnit, LocationMode, CustomLocation, DroneSize } from '../types';
 
 const STORAGE_KEY = 'droneblast-settings';
 
@@ -14,7 +14,9 @@ function load(): Settings {
 
 export function defaults(): Settings {
   return {
-    thresholdKmh: 25,
+    thresholdKmh: thresholdForDroneSize('freestyle'),
+    droneSize: 'freestyle',
+    maxAltitudeM: 180,
     unit: 'kmh',
     appearance: 'auto',
     refetchRadiusKm: 5,
@@ -55,6 +57,12 @@ export function thresholdStep(unit: WindUnit): number {
   if (unit === 'ms')    return 3.6;
   if (unit === 'knots') return 1.852;
   return 1;
+}
+
+export function thresholdForDroneSize(size: DroneSize): number {
+  if (size === 'whoop') return 18;
+  if (size === 'longRange') return 35;
+  return 25;
 }
 
 export function windColor(speed: number, thresholdKmh: number): string {

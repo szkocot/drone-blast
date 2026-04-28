@@ -1,8 +1,8 @@
 <!-- src/lib/components/SettingsSheet.svelte -->
 <script lang="ts">
   import { t } from '../i18n';
-  import { convertFromKmh, thresholdStep } from '../stores/settingsStore';
-  import type { Settings, WindUnit, AppAppearance, AppLanguage, TempUnit } from '../types';
+  import { convertFromKmh, thresholdForDroneSize, thresholdStep } from '../stores/settingsStore';
+  import type { Settings, WindUnit, AppAppearance, AppLanguage, TempUnit, DroneSize } from '../types';
 
   export let settings: Settings;
   export let modelCount: number;
@@ -14,17 +14,27 @@
 
   function increment() {
     const newKmh = Math.min(150, settings.thresholdKmh + step);
-    onChange({ thresholdKmh: newKmh });
+    onChange({ thresholdKmh: newKmh, droneSize: 'custom' });
   }
   function decrement() {
     const newKmh = Math.max(5, settings.thresholdKmh - step);
-    onChange({ thresholdKmh: newKmh });
+    onChange({ thresholdKmh: newKmh, droneSize: 'custom' });
   }
 
   const units: WindUnit[]       = ['kmh', 'ms', 'knots'];
+  const droneSizes: DroneSize[] = ['whoop', 'freestyle', 'longRange', 'custom'];
+  const altitudeCaps = [60, 120, 180];
   const appearances: AppAppearance[] = ['auto', 'light', 'dark'];
   const languages: AppLanguage[] = ['auto', 'en', 'pl'];
   const tempUnits: TempUnit[] = ['celsius', 'fahrenheit'];
+
+  function selectDroneSize(size: DroneSize) {
+    if (size === 'custom') {
+      onChange({ droneSize: size });
+      return;
+    }
+    onChange({ droneSize: size, thresholdKmh: thresholdForDroneSize(size) });
+  }
 </script>
 
 <!-- Backdrop -->
@@ -33,6 +43,18 @@
 <!-- Sheet -->
 <div class="sheet" role="dialog" aria-label={$t.settings}>
   <div class="handle"></div>
+
+  <div class="section">
+    <div class="section-label">{$t.droneSize}</div>
+    <div class="seg-group">
+      {#each droneSizes as size}
+        <button class:active={settings.droneSize === size} on:click={() => selectDroneSize(size)}>
+          {$t.droneSizes[size]}
+        </button>
+      {/each}
+    </div>
+    <div class="section-hint">{$t.droneSizeHint}</div>
+  </div>
 
   <div class="section">
     <div class="row">
@@ -46,6 +68,18 @@
         <button on:click={increment}>+</button>
       </div>
     </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">{$t.altitudeLimit}</div>
+    <div class="seg-group">
+      {#each altitudeCaps as cap}
+        <button class:active={settings.maxAltitudeM === cap} on:click={() => onChange({ maxAltitudeM: cap })}>
+          0-{cap}m
+        </button>
+      {/each}
+    </div>
+    <div class="section-hint">{$t.altitudeLimitHint}</div>
   </div>
 
   <div class="section">
@@ -143,6 +177,7 @@
     border-bottom: 1px solid var(--border);
   }
   .section-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section-hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
   .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
   .row-title { font-size: 14px; color: var(--text); }
   .row-hint  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }

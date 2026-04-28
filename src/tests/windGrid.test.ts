@@ -58,6 +58,17 @@ describe('peakInWindow', () => {
     expect(p?.speed).toBeCloseTo(99);
     expect(p?.heightIndex).toBe(10);
   });
+
+  it('ignores wind above the configured max altitude', () => {
+    const g = makeGrid(10, 168);
+    g.data[2][5] = 40;  // 60m
+    g.data[2][11] = 90; // 120m
+
+    const p = peakInWindow(g, 0, 60);
+
+    expect(p?.speed).toBeCloseTo(40);
+    expect(p?.heightIndex).toBe(5);
+  });
 });
 
 describe('bestFlyingWindow', () => {
@@ -82,6 +93,20 @@ describe('bestFlyingWindow', () => {
 
   it('returns null when always windy', () => {
     expect(bestFlyingWindow(makeGrid(99, 24), 25)).toBeNull();
+  });
+
+  it('uses the configured altitude cap for all-height windows', () => {
+    const g = makeGrid(50, 24);
+    for (let h = 4; h <= 6; h++) {
+      g.data[h] = Array.from({ length: 18 }, (_, i) => i < 6 ? 5 : 50);
+    }
+
+    const w = bestFlyingWindow(g, 25, 60);
+
+    expect(w).not.toBeNull();
+    expect(w?.startHour).toBe(4);
+    expect(w?.duration).toBe(3);
+    expect(w?.mode).toBe('allHeights');
   });
 });
 
@@ -112,5 +137,17 @@ describe('selectedHourForecast', () => {
 
     expect(selectedHourForecast(safeGrid, 0, 25).verdict).toBe('fly');
     expect(selectedHourForecast(windyGrid, 0, 25).verdict).toBe('nofly');
+  });
+
+  it('summarizes selected-hour peak wind only up to the configured max altitude', () => {
+    const g = makeGrid(12, 24);
+    g.data[1][5] = 28;  // 60m
+    g.data[1][11] = 55; // 120m
+
+    const forecast = selectedHourForecast(g, 1, 35, 60);
+
+    expect(forecast.peakWindKmh).toBe(28);
+    expect(forecast.peakHeightM).toBe(60);
+    expect(forecast.verdict).toBe('marginal');
   });
 });

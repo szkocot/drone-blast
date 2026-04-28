@@ -8,6 +8,7 @@
   export let grid: WindGrid;
   export let hourOffset: number;
   export let thresholdKmh: number;
+  export let maxAltitudeM: number;
   export let unit: WindUnit;
   export let tempUnit: TempUnit;
   export let kpData: KpData | null;
@@ -28,6 +29,7 @@
     {grid}
     {hourOffset}
     {thresholdKmh}
+    {maxAltitudeM}
     windUnit={unit}
     {tempUnit}
     {kpData}
@@ -44,6 +46,7 @@
     <p class="eyebrow">{$t.windThreshold}</p>
     <p class="threshold-value">{displayThreshold} {unitLabel}</p>
     <p class="threshold-note">{$t.thresholdHint}</p>
+    <p class="threshold-note">{$t.upToAltitude(maxAltitudeM)}</p>
   </div>
 
   <div class="rail-section">

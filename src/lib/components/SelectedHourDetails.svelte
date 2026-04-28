@@ -7,12 +7,13 @@
   export let grid: WindGrid;
   export let hourOffset: number;
   export let thresholdKmh: number;
+  export let maxAltitudeM: number;
   export let windUnit: WindUnit;
   export let tempUnit: TempUnit;
   export let kpData: KpData | null;
   export let compact = false;
 
-  $: forecast = selectedHourForecast(grid, hourOffset, thresholdKmh);
+  $: forecast = selectedHourForecast(grid, hourOffset, thresholdKmh, maxAltitudeM);
   $: unitLabel = $t.units[windUnit];
   $: displayWind = (kmh: number) => `${convertFromKmh(kmh, windUnit).toFixed(0)} ${unitLabel}`;
   $: displayTemp = `${convertTemp(forecast.temperatureC, tempUnit).toFixed(0)}${$t.tempUnits[tempUnit]}`;

@@ -5,6 +5,7 @@
   import { t } from '../i18n';
 
   export let thresholdKmh: number;
+  export let maxAltitudeM: number;
   export let unit: WindUnit;
   export let onSettings: () => void;
 
@@ -17,6 +18,7 @@
     <div class="threshold">
       <span class="label">{$t.threshold}</span>
       <span class="value">{displayVal} {unitLabel}</span>
+      <span class="altitude">0-{maxAltitudeM}m</span>
     </div>
 
     <div class="legend" aria-label="Wind legend">
@@ -68,6 +70,12 @@
     font-size: 13px;
     font-weight: 700;
     color: var(--text);
+  }
+
+  .altitude {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
   }
 
   .legend {

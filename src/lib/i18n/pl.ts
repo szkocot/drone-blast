@@ -1,5 +1,5 @@
 // src/lib/i18n/pl.ts
-import type { WindUnit, AppAppearance, AppLanguage, TempUnit, LocationMode } from '../types';
+import type { WindUnit, AppAppearance, AppLanguage, TempUnit, LocationMode, DroneSize } from '../types';
 import type { Translations } from './types';
 
 export const pl: Translations = {
@@ -19,6 +19,12 @@ export const pl: Translations = {
   cancel: 'Anuluj',
   windThreshold: 'Próg wiatru',
   thresholdHint: 'Żółta strefa zaczyna się przy 80% tej wartości',
+  droneSize: 'Rozmiar drona',
+  droneSizeHint: 'Wybór profilu aktualizuje próg wiatru',
+  droneSizes: { whoop: 'Whoop', freestyle: '5 cali', longRange: 'Long range', custom: 'Ręcznie' } as Record<DroneSize, string>,
+  altitudeLimit: 'Limit wysokości',
+  altitudeLimitHint: 'Analiza wiatru i mapa kończą się na tej wysokości',
+  upToAltitude: (m: number) => `Analiza 0-${m}m`,
   windSpeedUnit: 'Jednostka prędkości wiatru',
   appearance: 'Wygląd',
   dataSources: 'Źródła danych',

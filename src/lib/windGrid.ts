@@ -24,25 +24,40 @@ export function currentHourIndex(grid: WindGrid, now = new Date()): number {
   return idx >= 0 ? idx : 0;
 }
 
-export function peakInWindow(grid: WindGrid, hourOffset: number): { speed: number; heightIndex: number } | null {
+export function heightCountForMaxAltitude(maxAltitudeM = DISPLAY_HEIGHTS[DISPLAY_HEIGHTS.length - 1]): number {
+  const count = DISPLAY_HEIGHTS.filter(height => height <= maxAltitudeM).length;
+  return Math.max(1, count);
+}
+
+export function peakInWindow(
+  grid: WindGrid,
+  hourOffset: number,
+  maxAltitudeM = DISPLAY_HEIGHTS[DISPLAY_HEIGHTS.length - 1]
+): { speed: number; heightIndex: number } | null {
   const slice = sliceGrid(grid, hourOffset);
+  const heightCount = heightCountForMaxAltitude(maxAltitudeM);
   let max = -Infinity, heightIndex = 0;
   for (const row of slice) {
-    for (let hi = 0; hi < row.length; hi++) {
+    for (let hi = 0; hi < Math.min(row.length, heightCount); hi++) {
       if (row[hi] > max) { max = row[hi]; heightIndex = hi; }
     }
   }
   return max === -Infinity ? null : { speed: max, heightIndex };
 }
 
-export function bestFlyingWindow(grid: WindGrid, thresholdKmh: number): FlyingWindow | null {
+export function bestFlyingWindow(
+  grid: WindGrid,
+  thresholdKmh: number,
+  maxAltitudeM = DISPLAY_HEIGHTS[DISPLAY_HEIGHTS.length - 1]
+): FlyingWindow | null {
   const limit = Math.min(24, grid.data.length);
   const greenThreshold = thresholdKmh * YELLOW_FRACTION;
+  const heightCount = heightCountForMaxAltitude(maxAltitudeM);
 
-  const allGreen = longestRun(grid.data, limit, 0, 18, greenThreshold);
+  const allGreen = longestRun(grid.data, limit, 0, heightCount, greenThreshold);
   if (allGreen) return { ...allGreen, mode: 'allHeights' };
 
-  const lowGreen = longestRun(grid.data, limit, 0, 6, greenThreshold);
+  const lowGreen = longestRun(grid.data, limit, 0, Math.min(6, heightCount), greenThreshold);
   if (lowGreen) return { ...lowGreen, mode: 'lowOnly' };
 
   return null;
@@ -51,14 +66,16 @@ export function bestFlyingWindow(grid: WindGrid, thresholdKmh: number): FlyingWi
 export function selectedHourForecast(
   grid: WindGrid,
   hourOffset: number,
-  thresholdKmh: number
+  thresholdKmh: number,
+  maxAltitudeM = DISPLAY_HEIGHTS[DISPLAY_HEIGHTS.length - 1]
 ): SelectedHourForecast {
   const hourIndex = Math.max(0, Math.min(hourOffset, grid.times.length - 1));
   const row = grid.data[hourIndex] ?? [];
+  const heightCount = Math.min(row.length, heightCountForMaxAltitude(maxAltitudeM));
   let peakWindKmh = row[0] ?? 0;
   let peakIndex = 0;
 
-  for (let hi = 1; hi < row.length; hi++) {
+  for (let hi = 1; hi < heightCount; hi++) {
     if (row[hi] > peakWindKmh) {
       peakWindKmh = row[hi];
       peakIndex = hi;

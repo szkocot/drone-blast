@@ -4,6 +4,7 @@ export type WindUnit = 'kmh' | 'ms' | 'knots';
 export type AppAppearance = 'auto' | 'light' | 'dark';
 export type AppLanguage = 'auto' | 'en' | 'pl';
 export type TempUnit = 'celsius' | 'fahrenheit';
+export type DroneSize = 'whoop' | 'freestyle' | 'longRange' | 'custom';
 
 export type LocationMode = 'auto' | 'custom';
 
@@ -66,6 +67,8 @@ export interface SelectedHourForecast {
 
 export interface Settings {
   thresholdKmh: number;
+  droneSize: DroneSize;
+  maxAltitudeM: number;
   unit: WindUnit;
   appearance: AppAppearance;
   refetchRadiusKm: number;

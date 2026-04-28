@@ -8,10 +8,11 @@
   export let grid: WindGrid;
   export let hourOffset: number;
   export let thresholdKmh: number;
+  export let maxAltitudeM: number;
   export let unit: WindUnit;
 
-  $: forecast = selectedHourForecast(grid, hourOffset, thresholdKmh);
-  $: window = bestFlyingWindow(grid, thresholdKmh);
+  $: forecast = selectedHourForecast(grid, hourOffset, thresholdKmh, maxAltitudeM);
+  $: window = bestFlyingWindow(grid, thresholdKmh, maxAltitudeM);
 
   $: displaySpeed = (kmh: number) => convertFromKmh(kmh, unit).toFixed(0);
 

@@ -306,6 +306,7 @@
           grid={$windGrid}
           hourOffset={$hourOffset}
           thresholdKmh={$settingsStore.thresholdKmh}
+          maxAltitudeM={$settingsStore.maxAltitudeM}
           unit={$settingsStore.unit}
         />
 
@@ -314,6 +315,7 @@
             grid={$windGrid}
             hourOffset={$hourOffset}
             thresholdKmh={$settingsStore.thresholdKmh}
+            maxAltitudeM={$settingsStore.maxAltitudeM}
           />
         </div>
 
@@ -331,6 +333,7 @@
             grid={$windGrid}
             hourOffset={$hourOffset}
             thresholdKmh={$settingsStore.thresholdKmh}
+            maxAltitudeM={$settingsStore.maxAltitudeM}
             windUnit={$settingsStore.unit}
             tempUnit={$settingsStore.tempUnit}
             kpData={$kpStore}
@@ -342,12 +345,14 @@
           grid={$windGrid}
           hourOffset={$hourOffset}
           thresholdKmh={$settingsStore.thresholdKmh}
+          maxAltitudeM={$settingsStore.maxAltitudeM}
           onChange={v => hourOffset.set(v)}
         />
 
         <div class="mobile-footer">
           <ThresholdFooter
             thresholdKmh={$settingsStore.thresholdKmh}
+            maxAltitudeM={$settingsStore.maxAltitudeM}
             unit={$settingsStore.unit}
             onSettings={() => showSettings = true}
           />
@@ -359,6 +364,7 @@
           grid={$windGrid}
           hourOffset={$hourOffset}
           thresholdKmh={$settingsStore.thresholdKmh}
+          maxAltitudeM={$settingsStore.maxAltitudeM}
           unit={$settingsStore.unit}
           tempUnit={$settingsStore.tempUnit}
           kpData={$kpStore}

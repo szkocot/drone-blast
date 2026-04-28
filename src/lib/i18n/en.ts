@@ -1,5 +1,5 @@
 // src/lib/i18n/en.ts
-import type { WindUnit, AppAppearance, AppLanguage, TempUnit, LocationMode } from '../types';
+import type { WindUnit, AppAppearance, AppLanguage, TempUnit, LocationMode, DroneSize } from '../types';
 
 export const en = {
   appName: 'DRONE BLAST',
@@ -18,6 +18,12 @@ export const en = {
   cancel: 'Cancel',
   windThreshold: 'Wind Threshold',
   thresholdHint: 'Yellow zone starts at 80% of this value',
+  droneSize: 'Drone Size',
+  droneSizeHint: 'Selecting a profile updates the wind threshold',
+  droneSizes: { whoop: 'Whoop', freestyle: '5-inch', longRange: 'Long range', custom: 'Manual' } as Record<DroneSize, string>,
+  altitudeLimit: 'Altitude Limit',
+  altitudeLimitHint: 'Wind analysis and heatmap stop at this height',
+  upToAltitude: (m: number) => `Analyzing 0-${m}m`,
   windSpeedUnit: 'Wind Speed Unit',
   appearance: 'Appearance',
   dataSources: 'Data Sources',

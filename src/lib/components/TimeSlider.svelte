@@ -4,11 +4,13 @@
   import type { WindGrid } from '../types';
   import { nextOffsetFromKey } from '../sliderNavigation';
   import { windColor } from '../stores/settingsStore';
+  import { heightCountForMaxAltitude } from '../windGrid';
   import { t } from '../i18n';
 
   export let grid: WindGrid;
   export let hourOffset: number;
   export let thresholdKmh: number;
+  export let maxAltitudeM: number;
   export let onChange: (offset: number) => void;
 
   const MAX_OFFSET = 144; // 168h - 24h window
@@ -47,7 +49,7 @@
 
   function avgWindColor(t: number): string {
     let r = 0, g = 0, b = 0, a = 0;
-    const rows = 18;
+    const rows = heightCountForMaxAltitude(maxAltitudeM);
     for (let hi = 0; hi < rows; hi++) {
       const speed = grid.data[t]?.[hi] ?? 0;
       const [cr, cg, cb, ca] = parseRGBA(windColor(speed, thresholdKmh));
@@ -74,7 +76,7 @@
     ctx.fillRect(0, 0, W, H);
   }
 
-  $: thresholdKmh, drawTrack();
+  $: thresholdKmh, maxAltitudeM, drawTrack();
 
   onMount(() => { drawTrack(); });
 

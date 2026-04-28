@@ -3,13 +3,14 @@
   import { onMount, afterUpdate } from 'svelte';
   import { DISPLAY_HEIGHTS } from '../types';
   import { windColor } from '../stores/settingsStore';
-  import { sliceGrid } from '../windGrid';
+  import { heightCountForMaxAltitude, sliceGrid } from '../windGrid';
   import type { WindGrid } from '../types';
   import { t } from '../i18n';
 
   export let grid: WindGrid;
   export let hourOffset: number;
   export let thresholdKmh: number;
+  export let maxAltitudeM: number;
 
   $: dateLocale = $t.dateLocale;
 
@@ -66,7 +67,7 @@
 
     const slice = sliceGrid(grid, hourOffset);
     const cols = slice.length;            // up to 24
-    const rows = DISPLAY_HEIGHTS.length;  // 18
+    const rows = heightCountForMaxAltitude(maxAltitudeM);
 
     const cellW = (chartW - GAP * (cols - 1)) / cols;
     const cellH = (chartH - GAP * (rows - 1)) / rows;
